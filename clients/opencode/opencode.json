@@ -1,0 +1,224 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/coder-fast",
+  "small_model": "litellm/local-small",
+  "default_agent": "build",
+  "share": "manual",
+  "autoupdate": "notify",
+  "snapshot": true,
+  "subagent_depth": 1,
+  "lsp": true,
+  "enabled_providers": ["litellm"],
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 16000
+  },
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM Gateway",
+      "options": {
+        "baseURL": "http://localhost:4000/v1",
+        "apiKey": "{env:LITELLM_API_KEY}",
+        "timeout": 600000
+      },
+      "models": {
+        "reasoning-max": {
+          "name": "reasoning-max · Claude Fable 5.1 (gateway)",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 10, "output": 50, "cache_read": 0.25, "cache_write": 12.5 }
+        },
+        "coder-frontier": {
+          "name": "coder-frontier · Claude Opus 5 (gateway)",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 5, "output": 25, "cache_read": 0.5, "cache_write": 6.25 }
+        },
+        "coder-fast": {
+          "name": "coder-fast · Claude Sonnet 5 (gateway)",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 2, "output": 10, "cache_read": 0.2, "cache_write": 2.5 }
+        },
+        "coder-cheap": {
+          "name": "coder-cheap · Claude Haiku 4.5 (gateway)",
+          "limit": { "context": 200000, "output": 64000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 1, "output": 5, "cache_read": 0.1, "cache_write": 1.25 }
+        },
+        "coder-local": {
+          "name": "coder-local · Qwen3-Coder 30B-A3B (Ollama)",
+          "limit": { "context": 65536, "output": 16384 },
+          "modalities": { "input": ["text"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "local-small": {
+          "name": "local-small · Gemma 4 12B (Ollama)",
+          "limit": { "context": 65536, "output": 8192 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "claude-fable-5-1": {
+          "name": "Claude Fable 5.1",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 10, "output": 50, "cache_read": 0.25, "cache_write": 12.5 }
+        },
+        "claude-opus-5": {
+          "name": "Claude Opus 5",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 5, "output": 25, "cache_read": 0.5, "cache_write": 6.25 }
+        },
+        "claude-sonnet-5": {
+          "name": "Claude Sonnet 5",
+          "limit": { "context": 1000000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 2, "output": 10, "cache_read": 0.2, "cache_write": 2.5 }
+        },
+        "claude-haiku-4-5": {
+          "name": "Claude Haiku 4.5",
+          "limit": { "context": 200000, "output": 64000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 1, "output": 5, "cache_read": 0.1, "cache_write": 1.25 }
+        },
+        "gpt-6-astra": {
+          "name": "GPT-6 Astra",
+          "limit": { "context": 1050000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true,
+          "cost": { "input": 10, "output": 50, "cache_read": 1 }
+        },
+        "gpt-5.6-sol": {
+          "name": "GPT-5.6 Sol",
+          "limit": { "context": 1050000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "gpt-5.6-terra": {
+          "name": "GPT-5.6 Terra",
+          "limit": { "context": 1050000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "gpt-5.6-luna": {
+          "name": "GPT-5.6 Luna",
+          "limit": { "context": 1050000, "output": 128000 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "qwen3-coder-30b": {
+          "name": "Qwen3-Coder 30B-A3B (Ollama)",
+          "limit": { "context": 65536, "output": 16384 },
+          "modalities": { "input": ["text"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "qwen3-coder-480b": {
+          "name": "Qwen3-Coder 480B-A35B (hosted)",
+          "limit": { "context": 262144, "output": 65536 },
+          "modalities": { "input": ["text"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false
+        },
+        "gemma4-31b": {
+          "name": "Gemma 4 31B (Ollama)",
+          "limit": { "context": 65536, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "gemma4-26b": {
+          "name": "Gemma 4 26B-A4B (Ollama)",
+          "limit": { "context": 65536, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "gemma4-12b": {
+          "name": "Gemma 4 12B (Ollama)",
+          "limit": { "context": 65536, "output": 8192 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        },
+        "gemma4-e4b": {
+          "name": "Gemma 4 E4B (Ollama)",
+          "limit": { "context": 32768, "output": 8192 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false,
+          "cost": { "input": 0, "output": 0 }
+        }
+      }
+    }
+  },
+  "agent": {
+    "build": { "model": "litellm/coder-fast" },
+    "plan": { "model": "litellm/reasoning-max" },
+    "general": { "model": "litellm/coder-fast" },
+    "explore": { "model": "litellm/coder-local" },
+    "scout": { "model": "litellm/coder-cheap" }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "*": "allow",
+      "git push*": "ask",
+      "git reset --hard*": "ask",
+      "git clean*": "ask",
+      "git branch -D*": "ask",
+      "rm -rf*": "ask",
+      "sudo*": "ask",
+      "docker*": "ask",
+      "kubectl*": "ask",
+      "terraform*": "ask",
+      "curl*": "ask",
+      "wget*": "ask",
+      "ssh*": "ask",
+      "scp*": "ask"
+    },
+    "webfetch": "allow",
+    "skill": { "*": "allow" }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": false
+    }
+  },
+  "watcher": {
+    "ignore": ["node_modules/**", ".git/**", "dist/**", "build/**", ".venv/**", "target/**", "graphify-out/**", ".code-review-graph/**", ".serena/**", ".beads/**"]
+  }
+}

@@ -1,0 +1,28 @@
+# ~/.codex/config.toml — enterprise profile (distributed by the platform team)
+
+model_provider = "gateway"
+model = "coder-fast"
+model_reasoning_effort = "medium"
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+
+[model_providers.gateway]
+name = "Company AI Gateway"
+base_url = "https://gateway.example.internal/v1"
+env_key = "LITELLM_API_KEY"
+wire_api = "responses"
+
+# Only catalog servers; additions go through PR + security review.
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@1.0.0"]
+enabled = true
+startup_timeout_sec = 15
+
+# Trust is explicit per repository.
+# [projects."/home/me/src/approved-repo"]
+# trust_level = "trusted"

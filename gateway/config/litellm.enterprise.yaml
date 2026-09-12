@@ -1,0 +1,290 @@
+# LiteLLM proxy config — ENTERPRISE profile
+# Rationale for every control: docs/08-enterprise-profile.md §4.
+#
+# Differences from the personal profile:
+#   - explicit allowlist, no wildcards, each deployment carries access_groups and tags
+#   - tag routing: a key tagged `restricted` only reaches deployments tagged `restricted`
+#     (local models). Aliases have a *second* local deployment tagged restricted, so
+#     clients keep using `coder-fast` and the gateway decides where it runs.
+#   - reasoning-max resolves to claude-opus-5 (Claude Fable 5.1 requires 30-day retention;
+#     re-point to claude-fable-5-1 only if your retention terms allow it)
+#   - prompts/completions are not logged (turn_off_message_logging); metadata goes to OTel
+#   - Presidio PII masking runs pre_call on every request
+#   - budgets, alerting, no UI-driven model changes, no cross-lane context fallbacks
+#
+# Tag vocabulary (matches the classification scheme in docs/08 §3):
+#   default      — requests from keys without tags (Public / Internal work)
+#   confidential — external vendors only when your DPA/ZDR terms cover it
+#   restricted   — local deployments only
+# Access groups (assign to keys instead of model lists): external, local
+
+model_list:
+  # ============================================================================
+  # Anthropic — approved external vendor
+  # ============================================================================
+  - model_name: claude-opus-5
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: &drop_opencode ["reasoningSummary"]
+      tags: &external_tags ["default", "confidential"]
+      # EU residency (supported models only; verify passthrough on your LiteLLM version):
+      # inference_geo: "eu"
+    model_info: &external_info
+      access_groups: ["external"]
+      vendor: anthropic
+
+  - model_name: claude-sonnet-5
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: *external_info
+
+  - model_name: claude-haiku-4-5
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: *external_info
+
+  # Claude Fable 5.1: listed but NOT in the confidential lane and NOT aliased, because it
+  # requires 30-day retention. Remove entirely if your org is on ZDR terms.
+  - model_name: claude-fable-5-1
+    litellm_params:
+      model: anthropic/claude-fable-5-1
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: ["default"]
+    model_info:
+      access_groups: ["external-retention30"]
+      vendor: anthropic
+
+  # ============================================================================
+  # OpenAI — approved external vendor
+  # ============================================================================
+  - model_name: gpt-6-astra
+    litellm_params:
+      model: openai/gpt-6-astra
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], vendor: openai }
+
+  - model_name: gpt-5.6-terra
+    litellm_params:
+      model: openai/gpt-5.6-terra
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], vendor: openai }
+
+  - model_name: gpt-5.6-luna
+    litellm_params:
+      model: openai/gpt-5.6-luna
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], vendor: openai }
+
+  # ============================================================================
+  # Local lane — vLLM on org GPU servers (preferred for teams) or Ollama.
+  # These carry the `restricted` tag and are the only deployments restricted keys can use.
+  # ============================================================================
+  - model_name: qwen3-coder-30b
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: &local_tags ["default", "confidential", "restricted"]
+    model_info: &local_info
+      access_groups: ["local"]
+      vendor: local
+      max_input_tokens: 131072
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: gemma4-26b
+    litellm_params:
+      model: hosted_vllm/google/gemma-4-26b-a4b-it
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: *local_tags
+    model_info: *local_info
+
+  - model_name: gemma4-12b
+    litellm_params:
+      model: hosted_vllm/google/gemma-4-12b-it
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: *local_tags
+    model_info: *local_info
+
+  # Ollama alternative for a single workstation (swap api_base/model as needed):
+  # - model_name: qwen3-coder-30b
+  #   litellm_params:
+  #     model: ollama_chat/qwen3-coder:30b
+  #     api_base: os.environ/OLLAMA_API_BASE
+  #     num_ctx: 65536
+  #     tags: *local_tags
+  #   model_info: *local_info
+
+  # ============================================================================
+  # Role aliases — each has an external deployment (default/confidential) and a local
+  # deployment (restricted). Tag filtering picks the lane; the client never changes.
+  # ============================================================================
+  - model_name: reasoning-max
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], role: reasoning-max }
+  - model_name: reasoning-max
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: ["restricted"]
+    model_info: { access_groups: ["local"], role: reasoning-max, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+  - model_name: coder-frontier
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], role: coder-frontier }
+  - model_name: coder-frontier
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: ["restricted"]
+    model_info: { access_groups: ["local"], role: coder-frontier, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+  - model_name: coder-fast
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], role: coder-fast }
+  - model_name: coder-fast
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: ["restricted"]
+    model_info: { access_groups: ["local"], role: coder-fast, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+  - model_name: coder-cheap
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      tags: *external_tags
+    model_info: { access_groups: ["external"], role: coder-cheap }
+  - model_name: coder-cheap
+    litellm_params:
+      model: hosted_vllm/google/gemma-4-12b-it
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: ["restricted"]
+    model_info: { access_groups: ["local"], role: coder-cheap, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+  - model_name: coder-local
+    litellm_params:
+      model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: *local_tags
+    model_info: { access_groups: ["local"], role: coder-local, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+  - model_name: local-small
+    litellm_params:
+      model: hosted_vllm/google/gemma-4-12b-it
+      api_base: os.environ/VLLM_API_BASE
+      additional_drop_params: *drop_opencode
+      tags: *local_tags
+    model_info: { access_groups: ["local"], role: local-small, input_cost_per_token: 0, output_cost_per_token: 0 }
+
+# ==============================================================================
+router_settings:
+  routing_strategy: simple-shuffle
+  enable_tag_filtering: true       # the control that makes the lanes real
+  num_retries: 2
+  timeout: 600
+  allowed_fails: 3
+  cooldown_time: 30
+  enable_pre_call_checks: true
+  # Shared state across replicas (REDIS_HOST/REDIS_PORT come from the environment)
+  redis_host: os.environ/REDIS_HOST
+  redis_port: os.environ/REDIS_PORT
+  # Fallbacks stay within a vendor lane; never local → external, so a restricted request
+  # cannot escalate to a cloud model on error.
+  fallbacks:
+    - reasoning-max: ["gpt-6-astra"]
+    - coder-frontier: ["gpt-6-astra"]
+    - coder-fast: ["gpt-5.6-terra"]
+    - coder-cheap: ["gpt-5.6-luna"]
+    - coder-local: ["gemma4-26b"]
+    - local-small: ["gemma4-26b"]
+  context_window_fallbacks:
+    - coder-cheap: ["coder-fast"]
+  model_group_alias:
+    gpt-4o: coder-fast
+    gpt-4o-mini: coder-cheap
+
+# ==============================================================================
+litellm_settings:
+  drop_params: true
+  request_timeout: 600
+  num_retries: 2
+  json_logs: true
+  set_verbose: false
+  cache: false
+  turn_off_message_logging: true   # spend + metadata only; no prompt/completion bodies in the DB or callbacks
+  callbacks: ["otel"]              # audit trail to the org collector (OTEL_* env)
+  # Global safety net on top of team/key budgets (USD per period)
+  max_budget: 10000
+  budget_duration: "30d"
+
+# PII masking before anything leaves the network. Tune entities and thresholds to the
+# org's data; over-masking breaks code (identifiers that look like names), under-masking leaks.
+guardrails:
+  - guardrail_name: pii-mask
+    litellm_params:
+      guardrail: presidio
+      mode: pre_call
+      default_on: true
+      presidio_language: en
+      pii_entities_config:
+        EMAIL_ADDRESS: MASK
+        PHONE_NUMBER: MASK
+        CREDIT_CARD: MASK
+        IBAN_CODE: MASK
+        US_SSN: MASK
+        IP_ADDRESS: MASK
+      presidio_score_thresholds:
+        EMAIL_ADDRESS: 0.6
+        PHONE_NUMBER: 0.7
+        CREDIT_CARD: 0.8
+        IBAN_CODE: 0.8
+        US_SSN: 0.8
+        IP_ADDRESS: 0.8
+    guardrail_info:
+      owner: security
+      policy_ref: "AI-POLICY.md §4"
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: false
+  allow_requests_on_db_unavailable: false   # fail closed: no auth DB, no requests
+  alerting: ["slack"]                       # SLACK_WEBHOOK_URL in env
+  alerting_threshold: 300                   # seconds: slow-request alert
+  ui_access_mode: admin_only

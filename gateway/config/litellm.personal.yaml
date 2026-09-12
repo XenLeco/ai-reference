@@ -1,0 +1,287 @@
+# LiteLLM proxy config — PERSONAL profile
+# Design: docs/02-gateway-litellm.md. Model ladder: docs/01-models.md.
+#
+# Two kinds of public names live in model_list:
+#   1. role aliases  (coder-fast, reasoning-max, ...) — what agents and docs use
+#   2. vendor names  (claude-opus-5, gpt-6-astra, ...) — for tools that must pin a real ID
+# Every deployment reads credentials from the environment (os.environ/NAME). No literals.
+#
+# `additional_drop_params: ["reasoningSummary"]` removes a parameter OpenCode sends that some
+# providers reject (docs.litellm.ai/docs/tutorials/opencode_integration). The YAML anchor
+# defined on the first entry is reused below.
+
+model_list:
+  # ============================================================================
+  # Anthropic — vendor-native names
+  # ============================================================================
+  - model_name: claude-fable-5-1
+    litellm_params:
+      model: anthropic/claude-fable-5-1
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: &drop_opencode ["reasoningSummary"]
+    model_info:
+      vendor: anthropic
+      tier: frontier
+      note: "thinking always on; effort via output_config; needs 30-day retention"
+
+  - model_name: claude-opus-5
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: anthropic, tier: frontier }
+
+  - model_name: claude-sonnet-5
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: anthropic, tier: fast }
+
+  - model_name: claude-haiku-4-5
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: anthropic, tier: cheap }
+
+  # previous generation, kept as a fallback target
+  - model_name: claude-opus-4-8
+    litellm_params:
+      model: anthropic/claude-opus-4-8
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: anthropic, tier: frontier-prev }
+
+  # ============================================================================
+  # OpenAI — vendor-native names
+  # ============================================================================
+  - model_name: gpt-6-astra
+    litellm_params:
+      model: openai/gpt-6-astra
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: openai, tier: frontier }
+
+  - model_name: gpt-5.6-sol
+    litellm_params:
+      model: openai/gpt-5.6-sol
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: openai, tier: frontier }
+
+  - model_name: gpt-5.6-terra
+    litellm_params:
+      model: openai/gpt-5.6-terra
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: openai, tier: fast }
+
+  - model_name: gpt-5.6-luna
+    litellm_params:
+      model: openai/gpt-5.6-luna
+      api_key: os.environ/OPENAI_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: openai, tier: cheap }
+
+  # ============================================================================
+  # Local — Ollama (ollama_chat/ supports tool calling). Zero API cost.
+  # num_ctx raises the per-request context; Ollama's OLLAMA_CONTEXT_LENGTH must allow it.
+  # ============================================================================
+  - model_name: qwen3-coder-30b
+    litellm_params:
+      model: ollama_chat/qwen3-coder:30b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      vendor: local
+      tier: local-coder
+      max_input_tokens: 65536
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: gemma4-31b
+    litellm_params:
+      model: ollama_chat/gemma4:31b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      vendor: local
+      tier: local-general
+      max_input_tokens: 65536
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: gemma4-26b
+    litellm_params:
+      model: ollama_chat/gemma4:26b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      vendor: local
+      tier: local-general
+      max_input_tokens: 65536
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: gemma4-12b
+    litellm_params:
+      model: ollama_chat/gemma4:12b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      vendor: local
+      tier: local-small
+      max_input_tokens: 65536
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: gemma4-e4b
+    litellm_params:
+      model: ollama_chat/gemma4:e4b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 32768
+      additional_drop_params: *drop_opencode
+    model_info:
+      vendor: local
+      tier: local-small
+      max_input_tokens: 32768
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  # vLLM on a shared GPU box (uncomment and set VLLM_API_BASE). Better throughput than Ollama
+  # for several users; the model id is the Hugging Face repo you launched vLLM with.
+  # - model_name: qwen3-coder-30b-vllm
+  #   litellm_params:
+  #     model: hosted_vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct
+  #     api_base: os.environ/VLLM_API_BASE
+  #     additional_drop_params: *drop_opencode
+  #   model_info: { vendor: local, tier: local-coder, max_input_tokens: 262144 }
+
+  # ============================================================================
+  # Hosted open models — Qwen3-Coder 480B is server-class; rent it instead.
+  # Verify the slug at openrouter.ai/models before use.
+  # ============================================================================
+  - model_name: qwen3-coder-480b
+    litellm_params:
+      model: openrouter/qwen/qwen3-coder
+      api_key: os.environ/OPENROUTER_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { vendor: openrouter, tier: open-frontier }
+
+  # ============================================================================
+  # Role aliases — the public API. Re-point here when models change (and update docs/01).
+  # ============================================================================
+  - model_name: reasoning-max
+    litellm_params:
+      model: anthropic/claude-fable-5-1
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+      # Deeper reasoning for design work. Anthropic-specific; verify passthrough on your
+      # LiteLLM version before enabling:
+      # output_config: { effort: "xhigh" }
+    model_info: { role: reasoning-max, resolves_to: claude-fable-5-1 }
+
+  - model_name: coder-frontier
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { role: coder-frontier, resolves_to: claude-opus-5 }
+
+  - model_name: coder-fast
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { role: coder-fast, resolves_to: claude-sonnet-5 }
+
+  - model_name: coder-cheap
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+      additional_drop_params: *drop_opencode
+    model_info: { role: coder-cheap, resolves_to: claude-haiku-4-5 }
+
+  - model_name: coder-local
+    litellm_params:
+      model: ollama_chat/qwen3-coder:30b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      role: coder-local
+      resolves_to: qwen3-coder-30b
+      max_input_tokens: 65536
+      max_output_tokens: 16384
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+  - model_name: local-small
+    litellm_params:
+      model: ollama_chat/gemma4:12b
+      api_base: os.environ/OLLAMA_API_BASE
+      num_ctx: 65536
+      additional_drop_params: *drop_opencode
+    model_info:
+      role: local-small
+      resolves_to: gemma4-12b
+      max_input_tokens: 65536
+      max_output_tokens: 8192
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+
+# ==============================================================================
+# Router: retries on the same deployment, then walk the fallback list left→right.
+# Every fallback target must be a model_name above.
+# ==============================================================================
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 2
+  timeout: 600                   # seconds; frontier models on hard tasks take minutes
+  allowed_fails: 3
+  cooldown_time: 30
+  enable_pre_call_checks: true   # skip deployments whose context window is too small
+  fallbacks:
+    - reasoning-max: ["gpt-6-astra", "claude-opus-5"]
+    - coder-frontier: ["gpt-6-astra", "claude-sonnet-5"]
+    - coder-fast: ["gpt-5.6-terra", "claude-haiku-4-5"]
+    - coder-cheap: ["gpt-5.6-luna", "claude-sonnet-5"]
+    - coder-local: ["gemma4-26b"]
+    - local-small: ["gemma4-e4b"]
+    - claude-opus-5: ["claude-opus-4-8"]
+    - claude-fable-5-1: ["claude-opus-5"]
+  context_window_fallbacks:
+    - coder-cheap: ["coder-fast"]
+    - coder-local: ["coder-fast"]     # personal profile only: escalates local → cloud
+    - local-small: ["coder-cheap"]
+  # Legacy names some tools hardcode
+  model_group_alias:
+    gpt-4o: coder-fast
+    gpt-4o-mini: coder-cheap
+    claude-3-5-sonnet-latest: coder-fast
+
+# ==============================================================================
+litellm_settings:
+  drop_params: true              # drop params a provider does not support instead of failing
+  request_timeout: 600
+  num_retries: 2
+  json_logs: true
+  set_verbose: false
+  cache: false                   # response caching is wrong for coding agents
+  success_callback: []           # e.g. ["langfuse"] (self-hosted traces)
+  failure_callback: []
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: false       # this file is the truth; the UI is read-only for models

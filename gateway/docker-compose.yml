@@ -1,0 +1,88 @@
+# Personal profile. Enterprise: add -f docker-compose.enterprise.yml (overlay).
+name: ai-gateway
+
+services:
+  litellm:
+    # Floating stable tag while you evaluate; pin to main-v1.x.y afterwards.
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4000:4000"   # change to "4000:4000" to serve the LAN
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:-litellm}@db:5432/litellm
+      STORE_MODEL_IN_DB: "False"           # YAML is the source of truth
+      LITELLM_LOG: ${LITELLM_LOG:-INFO}
+    volumes:
+      - ./config/litellm.personal.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # reach a natively running Ollama on Linux
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4000/health/liveliness || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  db:
+    image: postgres:16-alpine
+    container_name: litellm-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-litellm}
+      POSTGRES_DB: litellm
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Optional: shared state for rate limits / cooldowns across replicas, or response cache.
+  # Valkey (BSD-3, Linux Foundation) instead of Redis: Redis 7.4+ is RSALv2/SSPL and Redis 8
+  # AGPL, none of which pass the permissive-license gate (docs/11). Protocol-compatible;
+  # LiteLLM's redis settings work unchanged. The service keeps the name `redis` so
+  # REDIS_HOST=redis resolves.
+  # docker compose --profile cache up -d
+  redis:
+    image: valkey/valkey:8-alpine
+    container_name: litellm-valkey
+    restart: unless-stopped
+    profiles: ["cache"]
+    command: ["valkey-server", "--save", "", "--appendonly", "no"]
+
+  # Optional: bundled Ollama. Prefer a native install for GPU access; then leave this off.
+  # docker compose --profile local up -d
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    profiles: ["local"]
+    ports:
+      - "127.0.0.1:11434:11434"
+    environment:
+      OLLAMA_CONTEXT_LENGTH: "65536"   # agents need a large window; default is far too small
+      OLLAMA_KEEP_ALIVE: "30m"
+      OLLAMA_FLASH_ATTENTION: "1"
+    volumes:
+      - ollama:/root/.ollama
+    # NVIDIA GPU: uncomment (requires nvidia-container-toolkit)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  pgdata: {}
+  ollama: {}

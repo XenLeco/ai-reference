@@ -1,0 +1,10 @@
+# Fragment for .github/CODEOWNERS — anything that instructs or configures agents is reviewed.
+/AGENTS.md            @org/platform @org/security
+/CLAUDE.md            @org/platform
+/GEMINI.md            @org/platform
+/opencode.json        @org/platform
+/.mcp.json            @org/platform @org/security
+/.cursor/             @org/platform
+/.agents/skills/      @org/platform @org/security
+/.claude/             @org/platform
+/.opencode/           @org/platform

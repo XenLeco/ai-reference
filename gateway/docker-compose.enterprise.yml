@@ -1,0 +1,66 @@
+# Enterprise overlay. Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.enterprise.yml up -d
+# Requires Docker Compose v2.24+ for the !override tag.
+# What it changes: enterprise config file, localhost-only bind (TLS proxy in front),
+# Presidio PII services for the guardrail, OpenTelemetry export, Valkey (service name `redis`)
+# for shared router state. All images are permissively licensed (LiteLLM MIT, Postgres,
+# Valkey BSD-3, Presidio MIT, Caddy Apache-2.0); LiteLLM's paid enterprise features are not used.
+
+services:
+  litellm:
+    ports: !override
+      - "127.0.0.1:4000:4000"
+    volumes: !override
+      - ./config/litellm.enterprise.yaml:/app/config.yaml:ro
+    environment:
+      # PII masking guardrail backends
+      PRESIDIO_ANALYZER_API_BASE: http://presidio-analyzer:3000
+      PRESIDIO_ANONYMIZER_API_BASE: http://presidio-anonymizer:3000
+      # Audit trail: OTLP/HTTP to the org collector (set OTEL_EXPORTER_OTLP_ENDPOINT in the vault/env)
+      OTEL_EXPORTER: otlp_http
+      OTEL_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4318/v1/traces}
+      OTEL_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+      # Shared router state across replicas
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      presidio-analyzer:
+        condition: service_started
+      presidio-anonymizer:
+        condition: service_started
+
+  redis:
+    profiles: !override []        # always on in enterprise mode
+
+  presidio-analyzer:
+    image: mcr.microsoft.com/presidio-analyzer:latest
+    container_name: presidio-analyzer
+    restart: unless-stopped
+    expose: ["3000"]
+
+  presidio-anonymizer:
+    image: mcr.microsoft.com/presidio-anonymizer:latest
+    container_name: presidio-anonymizer
+    restart: unless-stopped
+    expose: ["3000"]
+
+  # Optional TLS front door for a small deployment. Replace with the org ingress in production.
+  # docker compose ... --profile tls up -d   (set GATEWAY_HOSTNAME; Caddy obtains certificates)
+  caddy:
+    image: caddy:2-alpine
+    container_name: litellm-caddy
+    restart: unless-stopped
+    profiles: ["tls"]
+    ports:
+      - "443:443"
+      - "80:80"
+    command: ["caddy", "reverse-proxy", "--from", "${GATEWAY_HOSTNAME:-gateway.example.internal}", "--to", "litellm:4000"]
+    volumes:
+      - caddy_data:/data
+
+volumes:
+  caddy_data: {}

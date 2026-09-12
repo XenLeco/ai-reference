@@ -1,0 +1,219 @@
+{
+  "$comment": "Third-party skills, MCP tools and workflows assessed in docs/11-community-skills.md. Every entry under `skills` must carry a license from `license_allowlist` (scripts/validate.py enforces it); anything else goes under `excluded` with a reason. tier: instructions | scripts | plugin. category: retrieval | graph | memory | methodology | diagrams | restraint. safety.outbound_network: none | gateway-only | optional-gateway | third-party. Verified 2026-09-11.",
+  "license_allowlist": ["MIT", "MIT-0", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD", "Unlicense", "Zlib", "PostgreSQL"],
+  "rules": {
+    "one_methodology_pack": ["superpowers", "compound-engineering", "spec-kit", "aidlc-workflows"],
+    "one_code_graph": ["graphify", "code-review-graph"],
+    "always_present_overhead_budget_tokens": 10000,
+    "enterprise_requires": {
+      "outbound_network": ["none", "gateway-only", "optional-gateway"],
+      "telemetry": ["none", "opt-out"],
+      "install": "pinned version or vendored clone; no curl|sh on managed machines"
+    }
+  },
+  "skills": {
+    "serena": {
+      "repo": "https://github.com/oraios/serena",
+      "category": "retrieval",
+      "purpose": "LSP-backed MCP tools: find/reference symbols, read and edit at symbol level, project memories; read one function instead of a file",
+      "tier": "plugin",
+      "license": "MIT",
+      "requires": ["python 3.13 via uv", "language servers (auto-managed)"],
+      "install": {
+        "cli": ["uv tool install -p 3.13 serena-agent", "cd <project> && serena project index"],
+        "opencode": ["mcp.serena = { type: local, command: [serena, start-mcp-server, --context, ide-assistant, --project, .] }; tools: { \"serena*\": false }; enable per agent"],
+        "claude-code": ["claude mcp add serena -- serena start-mcp-server --context claude-code --project <path>"],
+        "codex": ["[mcp_servers.serena] command = \"serena\" args = [\"start-mcp-server\", \"--context\", \"codex\", \"--project\", \".\"]"]
+      },
+      "safety": { "executes_code": "local MCP server (Python)", "hooks": false, "always_on": false, "outbound_network": "none", "telemetry": "none", "writes_instruction_files": false, "writes": [".serena/"] },
+      "overhead_note": "~25 tool schemas per request when enabled; scope to build/test-writer agents",
+      "personal": "recommended",
+      "enterprise": "recommended-vendored",
+      "notes": "README: do not install from plugin marketplaces. Check `serena start-mcp-server --help` for context names on your version."
+    },
+    "graphify": {
+      "repo": "https://github.com/Graphify-Labs/graphify",
+      "category": "graph",
+      "purpose": "Local AST knowledge graph of the repo with visualization; query it instead of re-reading files; docs/PDF/image extraction optional via LLM",
+      "tier": "scripts",
+      "license": "Apache-2.0",
+      "license_note": "dual-licensed Apache-2.0 OR MIT",
+      "requires": ["python>=3.10", "uv or pipx"],
+      "install": {
+        "all-agents": ["uv tool install graphifyy", "graphify install --platform agents"],
+        "claude-code": ["graphify install"],
+        "cursor": ["graphify cursor install"],
+        "codex": ["graphify codex install"],
+        "gemini-cli": ["graphify install --platform gemini"]
+      },
+      "commands": ["/graphify .", "/graphify query \"...\"", "/graphify path A B", "/graphify explain X", "/graphify . --update"],
+      "safety": { "executes_code": "CLI + scripts", "hooks": "optional git hooks you install (graphify hook install)", "always_on": false, "outbound_network": "optional-gateway", "telemetry": "none", "writes_instruction_files": "codex install touches AGENTS.md", "writes": ["graphify-out/ (commit; ignore cache/)", ".graphifyignore"] },
+      "gateway_env": { "OPENAI_BASE_URL": "http://localhost:4000/v1", "OPENAI_API_KEY": "<virtual key>" },
+      "personal": "recommended",
+      "enterprise": "allowed-pinned",
+      "notes": "Pick this or code-review-graph. Add graphify-out/** to watcher/.claudeignore; `graphify update .` after pulls. Commercial platform exists but is not required."
+    },
+    "code-review-graph": {
+      "repo": "https://github.com/tirth8205/code-review-graph",
+      "category": "graph",
+      "purpose": "Self-updating tree-sitter code graph served over MCP: blast radius, callers/dependents/tests affected, semantic search; no LLM calls",
+      "tier": "plugin",
+      "license": "MIT",
+      "requires": ["python>=3.10", "uv or pipx"],
+      "install": {
+        "cli": ["uv tool install code-review-graph", "cd <project> && code-review-graph install --platform opencode   # or claude-code | codex | cursor | gemini-cli …"]
+      },
+      "safety": { "executes_code": "local MCP server (Python)", "hooks": "optional save/commit hooks and watch daemon", "always_on": false, "outbound_network": "none", "telemetry": "none", "writes_instruction_files": "injects graph-aware rules into client instruction files (review the diff)", "writes": [".code-review-graph/ (SQLite)", "MCP config for detected clients"] },
+      "overhead_note": "~30 tool schemas per request when enabled; scope per agent",
+      "personal": "recommended",
+      "enterprise": "allowed-pinned",
+      "notes": "Pick this or graphify"
+    },
+    "beads": {
+      "repo": "https://github.com/steveyegge/beads",
+      "category": "memory",
+      "purpose": "Git-backed dependency-aware issue graph for agents (bd); persistent task memory across sessions and parallel agents",
+      "tier": "scripts",
+      "license": "MIT",
+      "requires": ["brew or npm"],
+      "install": {
+        "cli": ["brew install beads   # or: npm install -g @beads/bd", "cd <project> && bd init"]
+      },
+      "commands": ["bd prime", "bd ready", "bd create", "bd update", "bd close", "bd dep", "bd remember"],
+      "safety": { "executes_code": "CLI (Go)", "hooks": false, "always_on": false, "outbound_network": "none", "telemetry": "none", "writes_instruction_files": "bd init appends a workflow snippet to AGENTS.md (review and relocate)", "writes": [".beads/ (JSONL in git + local DB)"] },
+      "personal": "recommended-for-long-work",
+      "enterprise": "allowed",
+      "notes": "Young project; read migration notes before upgrading"
+    },
+    "superpowers": {
+      "repo": "https://github.com/obra/superpowers",
+      "category": "methodology",
+      "purpose": "Auto-triggering methodology skills: brainstorming, writing/executing plans, TDD, systematic debugging, verification before completion, subagent-driven development, worktrees, code review",
+      "tier": "plugin",
+      "license": "MIT",
+      "install": {
+        "claude-code": ["/plugin install superpowers@claude-plugins-official"],
+        "codex": ["/plugins  → search Superpowers"],
+        "opencode": ["follow .opencode/INSTALL.md in the repository"]
+      },
+      "safety": { "executes_code": "plugin hooks in Claude Code", "hooks": true, "always_on": false, "outbound_network": "none", "telemetry": "opt-out (SUPERPOWERS_DISABLE_TELEMETRY=1)", "writes_instruction_files": false, "writes": ["client plugin directories"] },
+      "overlaps_with_local_skills": ["debug-reproduce-first", "code-review-checklist", "pr-writeup"],
+      "personal": "recommended",
+      "enterprise": "allowed-after-review",
+      "notes": "One methodology pack only. Remove overlapping local skills to avoid duplicate triggers"
+    },
+    "spec-kit": {
+      "repo": "https://github.com/github/spec-kit",
+      "category": "methodology",
+      "purpose": "Spec-driven development: constitution → specify → clarify → plan → tasks → analyze → implement → converge, artifacts in specs/",
+      "tier": "scripts",
+      "license": "MIT",
+      "requires": ["python>=3.11", "uv", "git"],
+      "install": {
+        "cli": ["uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@vX.Y.Z", "cd <project> && specify init . --integration opencode --force   # claude | codex | cursor | gemini | copilot …"]
+      },
+      "commands": ["/speckit.constitution", "/speckit.specify", "/speckit.clarify", "/speckit.plan", "/speckit.tasks", "/speckit.analyze", "/speckit.implement", "/speckit.converge", "/speckit.checklist"],
+      "safety": { "executes_code": "CLI (Python) + shell/PowerShell helper scripts in .specify/", "hooks": false, "always_on": false, "outbound_network": "none", "telemetry": "none", "writes_instruction_files": false, "writes": [".specify/", "specs/<feature>/", "memory/constitution.md"] },
+      "personal": "recommended-for-features",
+      "enterprise": "recommended-pinned",
+      "notes": "Per-feature workflow; no cost when unused. Pin the release tag"
+    },
+    "compound-engineering": {
+      "repo": "https://github.com/EveryInc/compound-engineering-plugin",
+      "category": "methodology",
+      "purpose": "Brainstorm → plan → work → simplify → review → compound loop; learnings ledger in docs/solutions/",
+      "tier": "plugin",
+      "license": "MIT",
+      "install": {
+        "claude-code": ["/plugin marketplace add EveryInc/compound-engineering-plugin", "/plugin install compound-engineering"],
+        "codex": ["codex plugin add compound-engineering@compound-engineering-plugin"],
+        "opencode": ["plugin += \"compound-engineering@git+https://github.com/EveryInc/compound-engineering-plugin.git#<sha>\""],
+        "cursor": ["/add-plugin compound-engineering"]
+      },
+      "commands": ["/ce-brainstorm", "/ce-plan", "/ce-work", "/ce-simplify-code", "/ce-code-review", "/ce-compound", "/ce-debug", "/lfg"],
+      "safety": { "executes_code": "plugin (skills, agents, commands)", "hooks": "review per version", "always_on": false, "outbound_network": "none", "telemetry": "none found", "writes_instruction_files": false, "writes": ["docs/plans/", "docs/solutions/", ".compound-engineering/config.yaml"] },
+      "overhead_note": "35 skill descriptions in context (~3-4k tokens)",
+      "personal": "alternative-to-superpowers",
+      "enterprise": "allowed-pinned",
+      "notes": "One methodology pack only"
+    },
+    "aidlc-workflows": {
+      "repo": "https://github.com/awslabs/aidlc-workflows",
+      "docs": "https://awslabs.github.io/aidlc-workflows/",
+      "category": "methodology",
+      "purpose": "AWS AI-Driven Development Life Cycle: /aidlc runs 5 phases / 33 stages with approval gates, 14 agents, audit trail; artifacts under aidlc/",
+      "tier": "plugin",
+      "license": "MIT-0",
+      "version_verified": "2.8.2",
+      "requires": ["opencode>=1.17 | claude-code | codex>=0.145 | cursor | kiro | copilot"],
+      "install": {
+        "unix": [
+          "tmp=$(mktemp -d)",
+          "curl -fsSL https://github.com/awslabs/aidlc-workflows/releases/latest/download/install.sh -o $tmp/install.sh",
+          "sha256sum $tmp/install.sh   # compare with the release page",
+          "sh $tmp/install.sh && rm -rf $tmp",
+          "cd <project> && aidlc config --harness opencode   # claude | codex | cursor | kiro | kiro-ide | copilot",
+          "aidlc doctor"
+        ],
+        "windows": ["irm https://github.com/awslabs/aidlc-workflows/releases/latest/download/install.ps1 -OutFile install.ps1; Get-FileHash install.ps1; & ./install.ps1", "aidlc config --harness opencode"],
+        "offline": ["download aidlc-runtime-X.Y.Z.tar.gz from releases; copy runtime/<harness>/ into the project"]
+      },
+      "commands": ["/aidlc <request>", "$aidlc <request> (Codex)", "aidlc doctor", "aidlc update"],
+      "safety": { "executes_code": "runtime + hooks + own agents", "hooks": true, "always_on": false, "outbound_network": "none (installer downloads a release once)", "telemetry": "none found", "writes_instruction_files": "undocumented; diff AGENTS.md after `aidlc config`", "writes": ["aidlc/", ".aidlc/ + .opencode/ (opencode)", "harness-specific agent/command files"] },
+      "recommended_model_upstream": "Claude Opus 4.8 (use coder-frontier via the gateway)",
+      "personal": "optional",
+      "enterprise": "strong-candidate-vendored",
+      "notes": "Heavyweight; multi-week features and regulated work"
+    },
+    "archify": {
+      "repo": "https://github.com/tt-a1i/archify",
+      "category": "diagrams",
+      "purpose": "Validated architecture / workflow / sequence / data-flow / lifecycle diagrams as self-contained HTML from JSON IR the agent writes",
+      "tier": "scripts",
+      "license": "MIT",
+      "requires": ["node"],
+      "install": {
+        "all-agents": ["npx -y skills add tt-a1i/archify -g -y"],
+        "codex": ["npx skills use tt-a1i/archify@archify --agent codex"]
+      },
+      "commands": ["node archify/bin/archify.mjs validate <type> <file>", "node archify/bin/archify.mjs deliver <type> <in.json> <out.html>", "node archify/bin/archify.mjs guide \"<description>\""],
+      "safety": { "executes_code": "Node renderer/validator", "hooks": false, "always_on": false, "outbound_network": "none", "telemetry": "none", "writes_instruction_files": false, "writes": ["diagram HTML/PNG/SVG where you point it (suggest docs/diagrams/)"] },
+      "personal": "recommended",
+      "enterprise": "allowed",
+      "notes": "Pairs with the architect and docs-writer agents; check generated HTML loads no remote assets"
+    },
+    "ponytail": {
+      "repo": "https://github.com/DietrichGebert/ponytail",
+      "category": "restraint",
+      "purpose": "Always-on 'write less code' decision ladder plus /ponytail-review, /ponytail-audit, /ponytail-debt",
+      "tier": "plugin",
+      "license": "MIT",
+      "requires": ["node on PATH for Claude Code / Codex hooks"],
+      "install": {
+        "opencode": ["add \"plugin\": [\"@dietrichgebert/ponytail@<version>\"] to ~/.config/opencode/opencode.json"],
+        "claude-code": ["/plugin marketplace add DietrichGebert/ponytail", "/plugin install ponytail@ponytail"],
+        "codex": ["codex plugin marketplace add DietrichGebert/ponytail", "codex plugin add ponytail@ponytail"],
+        "cursor": ["copy .cursor/rules/ from the repo"],
+        "gemini-cli": ["gemini extensions install https://github.com/DietrichGebert/ponytail"]
+      },
+      "commands": ["/ponytail lite|full|ultra|off", "/ponytail-review", "/ponytail-audit", "/ponytail-debt"],
+      "config": { "PONYTAIL_DEFAULT_MODE": "lite|full|ultra|off (default full)", "file": "~/.config/ponytail/config.json" },
+      "safety": { "executes_code": "plugin with hooks (Node)", "hooks": true, "always_on": true, "outbound_network": "none", "telemetry": "none found", "writes_instruction_files": false, "writes": ["~/.config/ponytail/config.json"] },
+      "personal": "try",
+      "enterprise": "review-as-plugin",
+      "notes": "Rules stack with AGENTS.md; AGENTS.md wins on conflict. Benchmarks are the project's own"
+    }
+  },
+  "excluded": {
+    "oh-my-openagent": {
+      "repo": "https://github.com/code-yeongyu/oh-my-openagent",
+      "license": "SUL-1.0",
+      "reason": "License is not OSI-approved (fails gate 1). Bundles a third-party web-search MCP (Exa) that cannot be routed through the gateway; replaces the agent set in this repo. Fork alvinunreal/oh-my-opencode-slim: check its LICENSE before considering."
+    },
+    "caveman": {
+      "repo": "https://github.com/JuliusBrussee/caveman",
+      "license": "MIT (skill) / BSL-1.1 (proxy)",
+      "reason": "Measured benefit 8.5% of output tokens on real agentic tasks (JetBrains 2026-07) against 1-1.5k input tokens of rules every turn; proxy component is BSL-1.1. Write AGENTS.md tersely instead."
+    }
+  }
+}

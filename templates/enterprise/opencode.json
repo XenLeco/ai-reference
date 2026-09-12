@@ -1,0 +1,65 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/coder-fast",
+  "share": "disabled",
+  "instructions": ["docs/CONTRIBUTING.md"],
+  "agent": {
+    "build": { "model": "litellm/coder-fast" },
+    "plan": { "model": "litellm/reasoning-max" },
+    "explore": { "model": "litellm/coder-local" }
+  },
+  "permission": {
+    "edit": "ask",
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/secrets/**": "deny",
+      "infra/**": "deny",
+      "deploy/**": "deny"
+    },
+    "bash": {
+      "*": "ask",
+      "git status": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "ls*": "allow",
+      "cat *": "allow",
+      "rg*": "allow",
+      "grep*": "allow",
+      "find*": "allow",
+      "make test*": "allow",
+      "make lint*": "allow",
+      "npm test*": "allow",
+      "npm run lint*": "allow",
+      "pnpm test*": "allow",
+      "pytest*": "allow",
+      "go test*": "allow",
+      "cargo test*": "allow",
+      "curl*": "deny",
+      "wget*": "deny",
+      "ssh*": "deny",
+      "scp*": "deny",
+      "sudo*": "deny",
+      "git push*": "deny",
+      "rm -rf*": "deny"
+    },
+    "webfetch": "deny",
+    "skill": { "*": "allow" }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    }
+  },
+  "tools": {
+    "context7*": false
+  }
+}

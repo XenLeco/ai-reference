@@ -1,0 +1,30 @@
+# ~/.codex/config.toml — personal profile, all traffic through the gateway.
+# Reference: learn.chatgpt.com/docs/config-file/config-reference
+
+model_provider = "litellm"
+model = "gpt-6-astra"              # any gateway model_name: "coder-frontier", "claude-opus-5", "coder-local"…
+model_reasoning_effort = "high"    # minimal | low | medium | high | xhigh (models that support it)
+
+# Safety: ask before actions Codex cannot undo; sandbox writes to the workspace only.
+approval_policy = "on-request"     # untrusted | on-request | on-failure | never
+sandbox_mode = "workspace-write"   # read-only | workspace-write | danger-full-access
+
+[sandbox_workspace_write]
+network_access = false             # flip to true only for tasks that need it
+
+[model_providers.litellm]
+name = "LiteLLM Gateway"
+base_url = "http://localhost:4000/v1"
+env_key = "LITELLM_API_KEY"        # the virtual key, exported in your shell
+wire_api = "responses"             # the only supported value
+
+# MCP servers (same servers as the other clients; see mcp/catalog.json)
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+enabled = true
+startup_timeout_sec = 15
+
+# Trust a project explicitly so Codex does not ask each time
+# [projects."/home/me/src/my-repo"]
+# trust_level = "trusted"

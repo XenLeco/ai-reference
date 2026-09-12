@@ -1,0 +1,9 @@
+---
+description: Repository instructions for agents (single source: AGENTS.md)
+alwaysApply: true
+---
+
+Follow the instructions in AGENTS.md at the repository root. It is the single source of
+project instructions for every agent tool; do not look for or create tool-specific copies.
+
+@AGENTS.md

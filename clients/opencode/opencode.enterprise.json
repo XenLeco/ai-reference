@@ -1,0 +1,138 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "litellm/coder-fast",
+  "small_model": "litellm/coder-cheap",
+  "default_agent": "build",
+  "share": "disabled",
+  "autoupdate": false,
+  "snapshot": true,
+  "subagent_depth": 1,
+  "lsp": true,
+  "enabled_providers": ["litellm"],
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 16000
+  },
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Company AI Gateway",
+      "options": {
+        "baseURL": "{env:LITELLM_BASE_URL}",
+        "apiKey": "{env:LITELLM_API_KEY}",
+        "timeout": 600000
+      },
+      "models": {
+        "reasoning-max": {
+          "name": "reasoning-max (gateway; lane decided by your key)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "coder-frontier": {
+          "name": "coder-frontier (gateway)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "coder-fast": {
+          "name": "coder-fast (gateway)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "coder-cheap": {
+          "name": "coder-cheap (gateway)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false
+        },
+        "coder-local": {
+          "name": "coder-local (org GPU, restricted-data safe)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false
+        },
+        "local-small": {
+          "name": "local-small (org GPU, restricted-data safe)",
+          "limit": { "context": 131072, "output": 16384 },
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false
+        }
+      }
+    }
+  },
+  "agent": {
+    "build": { "model": "litellm/coder-fast" },
+    "plan": { "model": "litellm/reasoning-max" },
+    "general": { "model": "litellm/coder-fast" },
+    "explore": { "model": "litellm/coder-local" },
+    "scout": { "model": "litellm/coder-cheap" }
+  },
+  "permission": {
+    "edit": "ask",
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/id_rsa*": "deny",
+      "**/id_ed25519*": "deny",
+      "**/secrets/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.kube/**": "deny"
+    },
+    "bash": {
+      "*": "ask",
+      "git status": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "git branch": "allow",
+      "ls*": "allow",
+      "cat *": "allow",
+      "grep*": "allow",
+      "rg*": "allow",
+      "find*": "allow",
+      "npm test*": "allow",
+      "npm run lint*": "allow",
+      "npm run build*": "allow",
+      "pnpm test*": "allow",
+      "pnpm lint*": "allow",
+      "pytest*": "allow",
+      "go test*": "allow",
+      "go build*": "allow",
+      "cargo test*": "allow",
+      "cargo build*": "allow",
+      "make test*": "allow",
+      "make lint*": "allow",
+      "curl*": "deny",
+      "wget*": "deny",
+      "nc *": "deny",
+      "ssh*": "deny",
+      "scp*": "deny",
+      "sudo*": "deny",
+      "git push*": "deny",
+      "rm -rf*": "deny"
+    },
+    "webfetch": "deny",
+    "skill": {
+      "*": "allow",
+      "experimental-*": "deny"
+    }
+  },
+  "mcp": {},
+  "watcher": {
+    "ignore": ["node_modules/**", ".git/**", "dist/**", "build/**", ".venv/**", "target/**", "graphify-out/**", ".code-review-graph/**", ".serena/**", ".beads/**"]
+  }
+}

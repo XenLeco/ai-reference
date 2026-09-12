@@ -1,0 +1,23 @@
+# secrets and local state
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+gateway/data/
+gateway/.litellm/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/settings.json
+
+# agent scratch
+.opencode/session/
+.opencode/node_modules/
+.claude/local/
+node_modules/
+__pycache__/

@@ -29,6 +29,12 @@ metadata:
 - **footer**: `BREAKING CHANGE: <what breaks and the migration>` and/or issue refs
   (`Closes #123`, `Refs PROJ-42`). A `!` after the type/scope (`feat(api)!:`) also marks a
   breaking change.
+- **AI assistance trailers**: when an agent produced or substantially shaped the change,
+  add `Assisted-by: LLM` (the Linux kernel's format; specialised analysis tools may follow,
+  e.g. `Assisted-by: LLM sparse`). Repositories that require traceability add a second
+  trailer `AI-Tool: <client> <model alias>` (e.g. `AI-Tool: OpenCode coder-fast`). Keep any
+  `Co-Authored-By:` trailer a tool adds. Never add `Signed-off-by:` on a human's behalf;
+  only the human author signs and is accountable.
 
 ## Procedure
 
@@ -53,6 +59,8 @@ only retried on 429. Add 529 to the retriable set and route through the
 existing fallback chain.
 
 Refs #88
+Assisted-by: LLM
+AI-Tool: OpenCode coder-fast
 ```
 
 ```

@@ -49,18 +49,22 @@ Copy, then edit `AGENTS.md`. Nothing else needs changes to start.
   Cap at what a human reads in 20 minutes, split otherwise.
 - **Worktrees for parallel agents.** `git worktree add ../repo-feat feat` lets two sessions
   work without stepping on each other. OpenCode and Claude Code both support this natively.
-- **AI disclosure in PRs**: a checkbox in the PR template ("AI assisted: yes/no, tool") is
-  cheap and makes the enterprise conversation (08) easy. Commit trailers
-  (`Co-Authored-By: <tool>`) are an alternative.
+- **AI disclosure**: a checkbox in the PR template ("AI assisted: yes/no, tool") plus the
+  commit trailer `Assisted-by: LLM` (the Linux kernel's format, machine-readable) and, where
+  traceability is required, `AI-Tool: <client> <alias>`. The `conventional-commits` skill
+  and the `/commit` command add them. Humans alone add `Signed-off-by`.
 - Secret scanning in pre-commit (`gitleaks`) and CI. Agents paste things.
 - Branch protection: tests + review required, no exceptions for agent branches.
 
 ## CI
 
 Run exactly the commands in `AGENTS.md`. If CI and `AGENTS.md` disagree, agents will
-"fix" the wrong one. An optional AI review job (Claude Code GitHub Action or an OpenCode
-run in a container) can post a first-pass review; give it a `ci` virtual key with a small
-monthly budget and read-only permissions. Never let CI agents push.
+"fix" the wrong one. The template ships three workflows: `security-scan.yml` (gitleaks,
+OSV-Scanner, Trivy, the license audit), `ai-review.yml` (OpenCode's read-only `/review-pr`
+through the gateway on a `ci` key, skipped for fork PRs) and `ai-assist.yml` (`/oc` mentions
+by repository members). A Claude Code variant is next to them as `.example`. The gateway
+must be reachable from the runner, which for a personal localhost gateway means a
+self-hosted runner. Never let CI agents push; the enterprise variant also requires a label.
 
 ## Monorepos
 

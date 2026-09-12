@@ -44,6 +44,10 @@ if [[ ! -e "$HOME/.claude/skills" ]]; then
   mkdir -p "$HOME/.claude"; ln -s "$SK" "$HOME/.claude/skills" && echo "  linked ~/.claude/skills -> $SK"
 fi
 
+echo "Sandbox policy -> $HOME/.srt-settings.json"
+place "$ROOT/clients/opencode/srt-settings.json" "$HOME/.srt-settings.json"
+echo "  use: npm i -g @anthropic-ai/sandbox-runtime && srt opencode   (Linux: apt-get install bubblewrap socat)"
+
 echo "Claude Code -> $CL"
 mkdir -p "$CL"
 cp "$ROOT/clients/claude-code/get-gateway-key.sh" "$CL/get-gateway-key.sh"; chmod +x "$CL/get-gateway-key.sh"

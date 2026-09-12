@@ -69,6 +69,7 @@ on zero-data-retention terms should alias `reasoning-max` to `claude-opus-5` (or
 | explicit allowlist, no wildcards | every `model_list` entry named; no `openai/*` | a new vendor model must be reviewed before anyone can use it |
 | access groups | `model_info.access_groups: [external, local]`; keys get groups not model lists | a group change updates every key |
 | tag routing | `router_settings.enable_tag_filtering: true`; deployments tagged | restricted data cannot reach external vendors even by mistake |
+| MCP gateway | `mcp_servers:` block; keys get `object_permission.mcp_servers` / `mcp_access_groups` (`create-key.sh … "context7,mcp-dev"`); clients use `<gateway>/mcp` | the MCP allowlist is enforced by the gateway, not by policy; upstream tokens never reach laptops |
 | content logging off | `litellm_settings.turn_off_message_logging: true` | spend and metadata are logged; prompts and completions are not stored in the gateway DB |
 | PII masking | `guardrails` → Presidio `pre_call`, `default_on: true` | emails, card numbers, national IDs masked before leaving the network; tune entities |
 | audit trail | `litellm_settings.callbacks: ["otel"]` to the org collector | who, when, which model, how many tokens; retained per policy |
@@ -96,7 +97,11 @@ catalog, `read` denied for `.env*`, `**/*.pem`, `**/secrets/**`.
 Claude Code (`managed-settings.enterprise.json`): distributed through managed settings so
 users cannot override; gateway URL pinned; `permissions.deny` for secret paths and
 `curl|wget|nc|ssh|scp`; `disableBypassPermissionsMode: "disable"`;
-`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`; models pinned to the approved Claude names.
+`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`; models pinned to the approved Claude names;
+the Bash **sandbox required** (`sandbox.enabled`, `failIfUnavailable`,
+`allowUnsandboxedCommands: false`, `allowManagedDomainsOnly`, `strictAllowlist`, network
+allowlist = gateway + internal registries). OpenCode on Linux/macOS runs under
+`sandbox-runtime` with `clients/opencode/srt-settings.enterprise.json` (doc 07).
 
 Codex (`codex-config.toml`): `sandbox_mode = "workspace-write"`, `approval_policy =
 "on-request"`, explicit `[projects]` trust, MCP allowlist.
@@ -118,8 +123,12 @@ Public/Internal repos.
   Vetting checklist and per-skill verdicts: doc 11.
 - PR template with mandatory AI-assistance disclosure and the reviewer checklist from the
   `code-review-checklist` skill.
-- Pre-commit: `gitleaks`; CI: dependency and license scanning (AI-generated code can
-  introduce copyleft snippets; flag unusual license headers).
+- Pre-commit: `gitleaks` (`templates/project/.pre-commit-config.yaml`); CI: secrets,
+  vulnerabilities and the dependency license audit
+  (`templates/project/.github/workflows/security-scan.yml`, `scripts/license-audit.sh --strict`).
+  AI-generated code can introduce copyleft snippets; flag unusual license headers.
+- AI review in CI only through `templates/enterprise/workflows/ai-review.yml`: self-hosted
+  runner, explicit `ai-review` label, read-only agent, pinned action, tagged CI key.
 - Branch protection: no direct pushes, tests required, one human approval minimum regardless
   of AI review.
 

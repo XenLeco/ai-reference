@@ -19,4 +19,5 @@
 ## AI assistance
 
 - [ ] No AI tools used
-- [ ] AI-assisted (tool: `<OpenCode / Claude Code / Codex / Cursor>`), all changes reviewed by me
+- [ ] AI-assisted (tool: `<OpenCode / Claude Code / Codex / Cursor>`), all changes reviewed by me;
+      commits carry the `Assisted-by: LLM` trailer

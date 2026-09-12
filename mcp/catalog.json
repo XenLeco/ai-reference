@@ -21,6 +21,16 @@
       "personal": true,
       "enterprise": true
     },
+    "claude-context": {
+      "purpose": "Semantic (hybrid BM25 + vector) code search over very large repos; AST chunking, incremental sync",
+      "license": "MIT",
+      "local": { "command": ["npx", "-y", "@zilliz/claude-context-mcp@<version>"], "env": { "EMBEDDING_PROVIDER": "Ollama", "OLLAMA_MODEL": "nomic-embed-code", "MILVUS_ADDRESS": "http://localhost:19530" } },
+      "install": "run Milvus locally (Apache-2.0); pull an Apache-2.0 embedding model in Ollama; see docs/12 §E",
+      "safety": { "outbound_network": "Milvus + embedding endpoint (local or gateway)", "telemetry": "check env for opt-out on your version", "executes": "local Node MCP server" },
+      "risk": "Index contains code embeddings: keep Milvus and embeddings local for Confidential/Restricted repos",
+      "personal": "optional",
+      "enterprise": "allowed-local-embeddings"
+    },
     "context7": {
       "purpose": "Up-to-date library documentation and code examples by version",
       "license": "MIT",

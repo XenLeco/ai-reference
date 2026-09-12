@@ -9,6 +9,8 @@ Installed to `~/.config/opencode/` by `scripts/install-personal.sh` (Windows:
 | `opencode.json` | `~/.config/opencode/opencode.json` | personal profile: LiteLLM provider, aliases, agent models, permissions |
 | `opencode.enterprise.json` | same path, enterprise machines | `share` disabled, no auto-update, `ask` by default, secrets unreadable, gateway-only providers |
 | `AGENTS.md` | `~/.config/opencode/AGENTS.md` | personal preferences that should not be committed to project repos |
+| `srt-settings.json` | `~/.srt-settings.json` | Anthropic `sandbox-runtime` policy (Apache-2.0): run `srt opencode` to confine every command to the working tree, temp and OpenCode's state dirs, with network only to the gateway, GitHub and registries. `npm i -g @anthropic-ai/sandbox-runtime`; Linux needs `bubblewrap socat` |
+| `srt-settings.enterprise.json` | same path on company machines | network = internal gateway and registries only; `infra/` and `deploy/` unwritable |
 | `agents/*.md` | `~/.config/opencode/agents/` | subagents: architect, reviewer, test-writer, docs-writer, security-auditor, local-scout |
 | `commands/*.md` | `~/.config/opencode/commands/` | `/plan /review /test /commit /pr /explain /fix /docs /security` |
 

@@ -64,8 +64,10 @@ Adding a vendor or model requires the checklist in docs/08 §7 and sign-off from
 
 - Use your own gateway credential; never share it; report loss immediately.
 - Review every AI-generated change as you would a colleague's; run the tests.
-- Disclose AI assistance in the PR template; keep the `Co-Authored-By` trailer if the tool
-  adds one.
+- Disclose AI assistance in the PR template and in commits: every AI-assisted commit ends
+  with the trailers `Assisted-by: LLM` (the Linux kernel's format) and
+  `AI-Tool: <client> <model alias>`; keep any `Co-Authored-By` trailer a tool adds. Only a
+  human adds `Signed-off-by` and carries accountability for the change.
 - Do not paste production data, customer records or secrets into any assistant.
 - Do not let an agent push, deploy, or modify infrastructure without explicit approval.
 - Follow the repository `AGENTS.md` policy block; when in doubt, ask <security contact>.

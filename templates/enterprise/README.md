@@ -11,6 +11,7 @@ Apply `templates/project/` first, then overlay these. Rationale for every contro
 | `codex-config.toml` | `~/.codex/config.toml` on company machines | sandboxed, approval on request, gateway-only |
 | `CODEOWNERS` | `.github/CODEOWNERS` fragment | review required for anything that instructs agents |
 | `PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | mandatory disclosure and reviewer checklist |
+| `workflows/ai-review.yml` | `.github/workflows/ai-review.yml` | label-gated, self-hosted, read-only, pinned AI review through the internal gateway |
 
 Client-level enterprise files live next to their personal counterparts:
 `clients/opencode/opencode.enterprise.json`, `clients/claude-code/managed-settings.enterprise.json`,

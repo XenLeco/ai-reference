@@ -18,6 +18,7 @@
 
 - [ ] No AI tools used
 - [ ] AI-assisted — tool(s): `<...>`; model alias: `<coder-fast / coder-local / ...>`
+- [ ] Every AI-assisted commit carries `Assisted-by: LLM` and `AI-Tool: <client> <alias>` trailers
 - [ ] All AI-generated changes were read and understood by me
 - [ ] No customer data, personal data or secrets were included in prompts
 - [ ] Repository data class respected (see AGENTS.md → Policy)

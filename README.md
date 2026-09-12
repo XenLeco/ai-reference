@@ -52,6 +52,7 @@ Then run `opencode` in that repo, type `/models`, pick `coder-fast`. Everything 
 | [docs/09-workflows.md](docs/09-workflows.md) | Day-to-day playbooks: feature, bug, refactor, review, docs |
 | [docs/10-troubleshooting.md](docs/10-troubleshooting.md) | Known failure modes and fixes |
 | [docs/11-community-skills.md](docs/11-community-skills.md) | Third-party tools that cut consumption (Serena, code graphs, beads) or sharpen decisions (superpowers, spec-kit, compound-engineering, AI-DLC); vetting checklist, recommended stacks |
+| [docs/12-roadmap.md](docs/12-roadmap.md) | Researched backlog: what to add next, prioritised, each item checked against the license and safety gates |
 | [docs/adr/](docs/adr/) | Decision records for the non-obvious choices |
 | [gateway/](gateway/) | LiteLLM: compose files, `litellm.personal.yaml`, `litellm.enterprise.yaml`, scripts |
 | [clients/opencode/](clients/opencode/) | Global `opencode.json`, agents, commands (installed to `~/.config/opencode/`) |
@@ -60,7 +61,7 @@ Then run `opencode` in that repo, type `/models`, pick `coder-fast`. Everything 
 | [mcp/](mcp/) | MCP server catalog and per-client declaration formats |
 | [templates/project/](templates/project/) | Drop-in files for any repo (`AGENTS.md`, `opencode.json`, `.mcp.json`, …) |
 | [templates/enterprise/](templates/enterprise/) | Policy file, managed settings, stricter project config |
-| [scripts/](scripts/) | Install and validate helpers (bash + PowerShell); `install-community-skills` is the opt-in installer for third-party skills |
+| [scripts/](scripts/) | Install and validate helpers (bash + PowerShell); `install-community-skills` is the opt-in installer for third-party skills; `license-audit` checks a project's dependency tree against the permissive allowlist |
 
 ## Principles (short version)
 

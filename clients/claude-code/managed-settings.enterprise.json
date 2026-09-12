@@ -10,6 +10,25 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "apiKeyHelper": "/usr/local/bin/get-gateway-key",
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": [],
+    "network": {
+      "allowManagedDomainsOnly": true,
+      "strictAllowlist": true,
+      "allowedDomains": [
+        "gateway.example.internal",
+        "registry.example.internal",
+        "git.example.internal"
+      ]
+    },
+    "filesystem": {
+      "denyRead": ["~/.ssh", "~/.aws", "~/.kube", "~/.gnupg", "~/.config/ai-gateway", "**/secrets/**"]
+    }
+  },
   "permissions": {
     "defaultMode": "default",
     "disableBypassPermissionsMode": "disable",

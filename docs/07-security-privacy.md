@@ -45,6 +45,30 @@ telemetry off, gateway pinned.
 Codex: `sandbox_mode = "workspace-write"` (network off inside the sandbox by default),
 `approval_policy = "on-request"`.
 
+## Sandboxing: OS-enforced boundaries for shell commands
+
+Permissions decide what the agent may *ask* to do; a sandbox decides what a command can
+*reach* once it runs, including every child process (`npm install` post-install scripts
+included). Three mechanisms, all permissively licensed or built into the vendor tool:
+
+| Client | Mechanism | Configured in |
+|---|---|---|
+| Claude Code | built-in Bash sandbox: Seatbelt on macOS, bubblewrap + socat on Linux/WSL2 (no native Windows). Writes confined to the working directory and temp; network through a proxy with an allowlist, prompting on first use of a new domain | `clients/claude-code/settings.json` (`sandbox` block); enterprise: `managed-settings.enterprise.json` with `failIfUnavailable`, `allowUnsandboxedCommands: false`, `allowManagedDomainsOnly`, `strictAllowlist` |
+| OpenCode (and any process) | Anthropic `sandbox-runtime` (`srt`, Apache-2.0): same primitives as a standalone wrapper. `npm i -g @anthropic-ai/sandbox-runtime`, then `srt opencode` | `clients/opencode/srt-settings.json` → `~/.srt-settings.json` (enterprise variant next to it) |
+| Codex | built-in `sandbox_mode = "workspace-write"` with `network_access = false` | `clients/codex/config.toml` |
+
+What the templates allow: the gateway host, package registries, GitHub; reads denied for
+`~/.ssh`, `~/.aws`, `~/.kube`, `~/.gnupg` and the gateway key directory; writes only to the
+working tree, temp and the client's own state directories; `docker` excluded from the
+Claude Code sandbox because it cannot run inside it. Linux needs `bubblewrap` and `socat`
+(`apt-get install bubblewrap socat`); Ubuntu 24.04+ needs the AppArmor user-namespace
+setting relaxed, see the Claude Code sandboxing doc. `srt` has an alpha native-Windows
+mode; Claude Code's sandbox needs WSL2 on Windows.
+
+A sandbox does not replace permissions: it contains the blast radius of a command that was
+already approved, and it does nothing for in-process tools (WebFetch, MCP), which keep their
+own permission rules.
+
 ## Prompt injection, concretely
 
 Every file, web page, MCP result and issue comment an agent reads can contain text like

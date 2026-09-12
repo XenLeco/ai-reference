@@ -1,0 +1,33 @@
+{
+  "network": {
+    "allowedDomains": [
+      "localhost:4000",
+      "127.0.0.1:4000",
+      "github.com",
+      "*.github.com",
+      "registry.npmjs.org",
+      "pypi.org",
+      "files.pythonhosted.org",
+      "crates.io",
+      "static.crates.io",
+      "index.crates.io",
+      "proxy.golang.org",
+      "sum.golang.org",
+      "mcp.context7.com"
+    ],
+    "deniedDomains": [],
+    "allowLocalBinding": true,
+    "deniedDomainReasons": {
+      "github.com:22": "SSH pushes are blocked in the sandbox; use an https remote or push from your own terminal"
+    }
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.aws", "~/.kube", "~/.gnupg", "~/.config/ai-gateway"],
+    "allowRead": [],
+    "allowWrite": [".", "/tmp", "~/.local/share/opencode", "~/.cache", "~/.config/opencode"],
+    "denyWrite": [".env", ".env.*", "~/.config/opencode/opencode.json", "~/.bashrc", "~/.zshrc", "~/.profile"]
+  },
+  "enableWeakerNestedSandbox": false,
+  "enableWeakerNetworkIsolation": false,
+  "allowAppleEvents": false
+}

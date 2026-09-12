@@ -13,5 +13,7 @@ Staged changes:
 
 If nothing is staged, show `git status --short` and ask which files to stage; do not stage
 everything blindly. Otherwise write the commit message (subject ≤ 72 chars, body explains
-why, footer for breaking changes or issue refs) and run `git commit` with it. Never amend,
-never push.
+why, footer for breaking changes or issue refs) and end it with the trailers
+`Assisted-by: LLM` and `AI-Tool: OpenCode <current model alias>`; keep any
+`Co-Authored-By:` trailer the tool adds and never add `Signed-off-by:`. Run `git commit`
+with it. Never amend, never push.

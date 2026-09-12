@@ -53,13 +53,23 @@
     "skill": { "*": "allow" }
   },
   "mcp": {
-    "context7": {
+    "gateway": {
       "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "enabled": true
+      "url": "{env:LITELLM_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer {env:LITELLM_API_KEY}",
+        "x-mcp-servers": "context7"
+      },
+      "enabled": true,
+      "timeout": 15000
     }
   },
   "tools": {
-    "context7*": false
+    "gateway*": false
+  },
+  "agent": {
+    "build": { "model": "litellm/coder-fast", "tools": { "gateway*": true } },
+    "plan": { "model": "litellm/reasoning-max" },
+    "explore": { "model": "litellm/coder-local" }
   }
 }

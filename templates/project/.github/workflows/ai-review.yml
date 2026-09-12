@@ -1,0 +1,61 @@
+# Read-only AI review of pull requests with OpenCode, routed through the LiteLLM gateway.
+#
+# Requirements
+#   - the gateway must be reachable from the runner: a self-hosted runner inside your network,
+#     or a gateway exposed behind TLS (the personal localhost:4000 is not reachable from GitHub)
+#   - repository variable LITELLM_BASE_URL  (e.g. https://gateway.example.internal)
+#   - repository secret   LITELLM_CI_KEY    (a virtual key: create-key.sh ci 20 30d "" "ci")
+#   - no secrets are exposed to pull requests from forks (the job is skipped for them)
+# The action is MIT. Pin `@latest` to a release tag once you have tested it.
+name: ai-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: OpenCode /review-pr
+        uses: anomalyco/opencode/github@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LITELLM_API_KEY: ${{ secrets.LITELLM_CI_KEY }}
+          # Inline OpenCode config (highest precedence): the gateway as the only provider.
+          OPENCODE_CONFIG_CONTENT: |
+            {
+              "share": "disabled",
+              "enabled_providers": ["litellm"],
+              "provider": {
+                "litellm": {
+                  "npm": "@ai-sdk/openai-compatible",
+                  "name": "LiteLLM Gateway",
+                  "options": { "baseURL": "${{ vars.LITELLM_BASE_URL }}/v1", "apiKey": "{env:LITELLM_API_KEY}" },
+                  "models": {
+                    "coder-fast": { "name": "coder-fast", "limit": { "context": 200000, "output": 32000 }, "tool_call": true, "reasoning": true }
+                  }
+                }
+              }
+            }
+        with:
+          use_github_token: true
+          model: litellm/coder-fast
+          prompt: /review-pr

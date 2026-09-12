@@ -19,5 +19,10 @@ Copy-Item templates/project/* /path/to/repo -Recurse -Force   # PowerShell
 | `.agents/skills/` | OpenCode, Claude Code, Codex | add project-specific skills |
 | `.editorconfig` | editors and agents | rarely |
 | `.github/PULL_REQUEST_TEMPLATE.md` | GitHub | adapt to the repo |
+| `.pre-commit-config.yaml` | pre-commit | run `pre-commit autoupdate` to pin revisions, then `pre-commit install` |
+| `.github/workflows/security-scan.yml` | GitHub Actions | gitleaks, OSV-Scanner, Trivy, license audit; pin action SHAs |
+| `.github/workflows/ai-review.yml` | GitHub Actions | OpenCode read-only PR review via the gateway; set `LITELLM_BASE_URL` var and `LITELLM_CI_KEY` secret |
+| `.github/workflows/ai-assist.yml` | GitHub Actions | `/oc` mentions by repo members |
+| `.github/workflows/ai-review-claude.yml.example` | GitHub Actions | Claude Code alternative; rename to enable |
 
 Enterprise repositories use `templates/enterprise/` on top of this.

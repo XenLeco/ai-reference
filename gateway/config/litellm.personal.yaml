@@ -241,6 +241,16 @@ model_list:
       output_cost_per_token: 0
 
 # ==============================================================================
+# Optional: MCP gateway. Register shared/remote MCP servers once and point every client at
+# <gateway>/mcp with the virtual key (docs/12 §A). Uncomment to use.
+# ==============================================================================
+# mcp_servers:
+#   context7:
+#     url: https://mcp.context7.com/mcp
+#     transport: http
+#     allow_all_keys: true
+
+# ==============================================================================
 # Router: retries on the same deployment, then walk the fallback list left→right.
 # Every fallback target must be a model_name above.
 # ==============================================================================

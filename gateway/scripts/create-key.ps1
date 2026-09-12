@@ -14,6 +14,7 @@ param(
   [string[]]$Models = @(),
   [string[]]$Tags = @(),
   [string]$TeamId = "",
+  [string[]]$Mcp = @(),          # MCP servers and/or access groups (names starting with mcp- are groups)
   [string]$Base = $(if ($env:LITELLM_BASE_URL) { $env:LITELLM_BASE_URL } else { "http://localhost:4000" })
 )
 $ErrorActionPreference = "Stop"
@@ -28,6 +29,14 @@ $payload = @{
 if ($Models.Count -gt 0) { $payload.models = $Models }
 if ($Tags.Count -gt 0)   { $payload.tags = $Tags }
 if ($TeamId)             { $payload.team_id = $TeamId }
+if ($Mcp.Count -gt 0) {
+  $perm = @{}
+  $servers = @($Mcp | Where-Object { $_ -notlike "mcp-*" })
+  $groups  = @($Mcp | Where-Object { $_ -like "mcp-*" })
+  if ($servers.Count -gt 0) { $perm.mcp_servers = $servers }
+  if ($groups.Count -gt 0)  { $perm.mcp_access_groups = $groups }
+  $payload.object_permission = $perm
+}
 
 $resp = Invoke-RestMethod -Method Post -Uri "$Base/key/generate" `
   -Headers @{ Authorization = "Bearer $($env:LITELLM_MASTER_KEY)" } `

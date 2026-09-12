@@ -1,0 +1,20 @@
+{
+  "network": {
+    "allowedDomains": [
+      "gateway.example.internal",
+      "registry.example.internal",
+      "git.example.internal"
+    ],
+    "deniedDomains": [],
+    "allowLocalBinding": false
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.aws", "~/.kube", "~/.gnupg", "~/.config/ai-gateway", "~/.config/opencode/opencode.json"],
+    "allowRead": [],
+    "allowWrite": [".", "/tmp", "~/.local/share/opencode", "~/.cache/opencode"],
+    "denyWrite": [".env", ".env.*", "infra", "deploy", "~/.bashrc", "~/.zshrc", "~/.profile"]
+  },
+  "enableWeakerNestedSandbox": false,
+  "enableWeakerNetworkIsolation": false,
+  "allowAppleEvents": false
+}

@@ -1,0 +1,42 @@
+# Alternative reviewer using the Claude Code GitHub Action (MIT) through the gateway.
+# Rename to ai-review-claude.yml to enable; do not run both reviewers on the same PR.
+# Claude Code through a gateway must use Claude models (Anthropic does not support routing it
+# to other models). The action reads ANTHROPIC_BASE_URL from env and sends the key as x-api-key,
+# which the LiteLLM /v1/messages endpoint accepts.
+name: ai-review-claude
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1   # pin to a tag/SHA
+        env:
+          ANTHROPIC_BASE_URL: ${{ vars.LITELLM_BASE_URL }}
+          CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+        with:
+          anthropic_api_key: ${{ secrets.LITELLM_CI_KEY }}
+          prompt: |
+            Review this pull request as a read-only reviewer. Load the code-review-checklist skill
+            if available. Report blockers, should-fix items and at most five nits, each with
+            file:line and a concrete fix, then a one-line verdict. Do not edit files.
+          claude_args: "--model claude-sonnet-5 --max-turns 25"
+
+# Codex alternative: openai/codex-action (Apache-2.0) wraps `codex exec`. Route it through the
+# gateway by checking in a config.toml with [model_providers.litellm] (see clients/codex/) and
+# pointing CODEX_HOME at that directory in the job's env.

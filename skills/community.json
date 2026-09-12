@@ -1,6 +1,9 @@
 {
   "$comment": "Third-party skills, MCP tools and workflows assessed in docs/11-community-skills.md. Every entry under `skills` must carry a license from `license_allowlist` (scripts/validate.py enforces it); anything else goes under `excluded` with a reason. tier: instructions | scripts | plugin. category: retrieval | graph | memory | methodology | diagrams | restraint. safety.outbound_network: none | gateway-only | optional-gateway | third-party. Verified 2026-09-11.",
   "license_allowlist": ["MIT", "MIT-0", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "0BSD", "Unlicense", "Zlib", "PostgreSQL"],
+  "dependency_license_allowlist_extra": ["PSF-2.0", "Python-2.0", "CC0-1.0", "BlueOak-1.0.0", "MIT-CMU", "X11", "BSD-1-Clause", "Apache-2.0 WITH LLVM-exception"],
+  "dependency_license_warnlist": ["MPL-2.0"],
+  "$comment_dependency_lists": "Used by scripts/license_audit.py for dependency trees. `extra` are permissive ids that only appear in package metadata; `warnlist` is weak copyleft that warns (fails with --strict). Everything else fails.",
   "rules": {
     "one_methodology_pack": ["superpowers", "compound-engineering", "spec-kit", "aidlc-workflows"],
     "one_code_graph": ["graphify", "code-review-graph"],
@@ -84,6 +87,22 @@
       "personal": "recommended-for-long-work",
       "enterprise": "allowed",
       "notes": "Young project; read migration notes before upgrading"
+    },
+    "claude-context": {
+      "repo": "https://github.com/zilliztech/claude-context",
+      "category": "retrieval",
+      "purpose": "Hybrid BM25 + dense-vector semantic code search over AST-chunked code via MCP; Merkle-tree incremental sync; for very large repos where a graph or symbol lookup is not enough",
+      "tier": "plugin",
+      "license": "MIT",
+      "requires": ["node", "Milvus (Apache-2.0, local docker) or Zilliz Cloud", "embedding model: Ollama (nomic-embed-code / Qwen3-Embedding, Apache-2.0) or an OpenAI-compatible endpoint (the gateway)"],
+      "install": {
+        "mcp": ["npx -y @zilliz/claude-context-mcp@<version>  with EMBEDDING_PROVIDER=Ollama (or OpenAI + OPENAI_BASE_URL=http://localhost:4000/v1) and MILVUS_ADDRESS=http://localhost:19530"]
+      },
+      "safety": { "executes_code": "local MCP server (Node) + Milvus container", "hooks": false, "always_on": false, "outbound_network": "optional-gateway", "telemetry": "check env for opt-out on your version", "writes_instruction_files": false, "writes": ["index in Milvus; local sync state"] },
+      "overhead_note": "few tools; index build costs embedding calls once, then incremental",
+      "personal": "optional-large-repos",
+      "enterprise": "allowed-pinned-local-embeddings",
+      "notes": "Third retrieval option next to Serena (symbols) and a code graph (structure). Keep embeddings local for Confidential/Restricted repos"
     },
     "superpowers": {
       "repo": "https://github.com/obra/superpowers",

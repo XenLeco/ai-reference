@@ -8,6 +8,30 @@
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
   "apiKeyHelper": "~/.claude/get-gateway-key.sh",
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": ["docker *"],
+    "network": {
+      "allowedDomains": [
+        "localhost",
+        "127.0.0.1",
+        "github.com",
+        "*.github.com",
+        "registry.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "crates.io",
+        "static.crates.io",
+        "index.crates.io",
+        "proxy.golang.org",
+        "sum.golang.org"
+      ]
+    },
+    "filesystem": {
+      "denyRead": ["~/.ssh", "~/.aws", "~/.kube", "~/.gnupg", "~/.config/ai-gateway"]
+    }
+  },
   "permissions": {
     "deny": [
       "Read(./.env)",

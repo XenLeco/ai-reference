@@ -46,6 +46,10 @@ if (-not (Test-Path $claudeSkills)) {
   catch { Write-Host "  (could not create junction for ~/.claude/skills; copy manually)" }
 }
 
+Write-Host "Sandbox policy -> $HOME\.srt-settings.json"
+Place (Join-Path $Root "clients\opencode\srt-settings.json") (Join-Path $HOME ".srt-settings.json")
+Write-Host "  use: npm i -g @anthropic-ai/sandbox-runtime; npx @anthropic-ai/sandbox-runtime windows-install (alpha); srt opencode"
+
 Write-Host "Claude Code -> $CL"
 New-Item -ItemType Directory -Force $CL | Out-Null
 Copy-Item (Join-Path $Root "clients\claude-code\get-gateway-key.ps1") (Join-Path $CL "get-gateway-key.ps1") -Force

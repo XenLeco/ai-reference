@@ -1,0 +1,20 @@
+# pre-commit (MIT) hooks for the AI-ready project template.
+# Install once:  pip install pre-commit  (or: uv tool install pre-commit)   then:  pre-commit install
+# Pin revisions:  pre-commit autoupdate   (replaces the placeholder revs below with real tags)
+repos:
+  # Secret scanning before anything reaches git history. gitleaks is MIT.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: vX.Y.Z   # run `pre-commit autoupdate` to pin the current release
+    hooks:
+      - id: gitleaks
+
+  # Whitespace and file hygiene so agent edits do not produce noise diffs.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: vX.Y.Z
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+      - id: detect-private-key

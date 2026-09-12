@@ -48,6 +48,7 @@ mounted from a reviewed git repo, secrets from the org's vault. See 08.
 | `POST /key/generate`, `/key/delete`, `/key/info` | key management with the master key |
 | `POST /team/new`, `/team/update` | teams (enterprise) |
 | `GET /ui` | admin UI (uses `UI_USERNAME`/`UI_PASSWORD`) |
+| `/mcp` (+ `x-mcp-servers` header) | MCP gateway: registered servers exposed to keys that hold `object_permission.mcp_servers` or an access group (enterprise config; optional block in personal) |
 
 ## Config anatomy
 

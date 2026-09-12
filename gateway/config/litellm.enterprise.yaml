@@ -213,6 +213,33 @@ model_list:
     model_info: { access_groups: ["local"], role: local-small, input_cost_per_token: 0, output_cost_per_token: 0 }
 
 # ==============================================================================
+# MCP gateway (open source since v1.78): one /mcp endpoint for every client, servers registered
+# here, access granted per key/team with object_permission.mcp_servers (create-key.sh 7th arg).
+# Upstream credentials stay on the gateway. Local stdio servers (Serena, code-review-graph) stay
+# on developer machines; only shared/remote servers belong here.
+# ==============================================================================
+mcp_servers:
+  context7:
+    url: https://mcp.context7.com/mcp
+    transport: http
+    description: "Library documentation by version (queries only, no repo content)"
+    allow_all_keys: true            # harmless for every developer
+  github:
+    url: https://api.githubcopilot.com/mcp/
+    transport: http
+    auth_type: bearer_token
+    auth_value: os.environ/GITHUB_MCP_TOKEN   # fine-grained PAT, read scopes unless writes are approved
+    description: "GitHub issues, PRs, code search"
+    access_groups: ["mcp-dev"]      # keys/teams get this group, not the server name
+    disallowed_tools: ["delete_repository", "delete_branch"]
+  # atlassian:
+  #   url: https://mcp.atlassian.com/v1/mcp
+  #   transport: http
+  #   auth_type: oauth2
+  #   description: "Jira / Confluence"
+  #   access_groups: ["mcp-dev"]
+
+# ==============================================================================
 router_settings:
   routing_strategy: simple-shuffle
   enable_tag_filtering: true       # the control that makes the lanes real

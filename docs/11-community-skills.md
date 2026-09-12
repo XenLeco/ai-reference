@@ -206,6 +206,21 @@ navigation and editing, a graph is whole-repo structure and impact.
 **Verdict.** Personal: **recommended** (one of the two) for repos over a few thousand lines.
 Enterprise: **allowed**, pinned.
 
+### claude-context — semantic code search for very large repos (MCP) · MIT
+
+**What.** Zilliz's MCP server: hybrid BM25 + dense-vector search over AST-chunked code,
+Merkle-tree incremental sync, backed by Milvus (Apache-2.0, runs locally in Docker) and an
+embedding model from Ollama (`nomic-embed-code`, Qwen3-Embedding; Apache-2.0) or any
+OpenAI-compatible endpoint, which means the gateway. Where Serena is precise navigation and
+a graph is structure, this is search by meaning across millions of lines.
+
+**Safety.** Local server and local index; embedding traffic goes to Ollama or the gateway.
+Check the telemetry environment variables for your version. Index contents are code
+embeddings: keep Milvus and the embedding model local for Confidential and Restricted repos.
+
+**Verdict.** Personal: **optional**, worth it only when a repo outgrows Serena plus a
+graph. Enterprise: **allowed** with local embeddings. Details and setup in doc 12 §E.
+
 ### beads — persistent task graph (memory across sessions) · MIT
 
 **What.** `bd`, a CLI issue tracker built for agents: hash ids (`bd-a1b2`), dependencies,
@@ -376,6 +391,7 @@ Listed so nobody re-evaluates them from scratch. They stay in `skills/community.
 | Serena | retrieval | MIT | MCP | none | recommended | recommended, vendored |
 | graphify | code graph | Apache-2.0 / MIT | CLI + skill | gateway or Ollama, optional | recommended (pick one graph) | allowed, pinned |
 | code-review-graph | code graph | MIT | CLI + MCP | none | recommended (pick one graph) | allowed, pinned |
+| claude-context | retrieval (vector) | MIT | MCP + Milvus | local or gateway (embeddings) | optional, very large repos | allowed, local embeddings |
 | beads | memory | MIT | CLI | none | recommended for long work | allowed |
 | superpowers | methodology | MIT | plugin + skills | telemetry opt-out | recommended | allowed after review, telemetry off |
 | spec-kit | methodology (features) | MIT | CLI + commands | none | recommended | recommended, pinned tag |

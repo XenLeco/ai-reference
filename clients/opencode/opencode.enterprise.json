@@ -131,7 +131,20 @@
       "experimental-*": "deny"
     }
   },
-  "mcp": {},
+  "mcp": {
+    "gateway": {
+      "type": "remote",
+      "url": "{env:LITELLM_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer {env:LITELLM_API_KEY}"
+      },
+      "enabled": true,
+      "timeout": 15000
+    }
+  },
+  "tools": {
+    "gateway*": false
+  },
   "watcher": {
     "ignore": ["node_modules/**", ".git/**", "dist/**", "build/**", ".venv/**", "target/**", "graphify-out/**", ".code-review-graph/**", ".serena/**", ".beads/**"]
   }

@@ -24,6 +24,19 @@ Base URL is the gateway **root** (no `/v1`). Details: [docs/04-other-clients.md]
 Alternative to the helper: put `ANTHROPIC_AUTH_TOKEN` in the `env` block. Simpler, but the
 key then sits in a JSON file.
 
+## Sandbox
+
+`settings.json` enables the built-in Bash sandbox (`sandbox.enabled`), auto-allows
+sandboxed commands, allows network only to the gateway, GitHub and package registries,
+denies reads of `~/.ssh`, `~/.aws`, `~/.kube`, `~/.gnupg` and the gateway key directory, and
+excludes `docker` (it cannot run inside the sandbox). Linux/WSL2: `sudo apt-get install
+bubblewrap socat`; native Windows is not supported, use WSL2. `/sandbox` in a session shows
+missing dependencies. The enterprise managed settings make it mandatory
+(`failIfUnavailable`, `allowUnsandboxedCommands: false`, `allowManagedDomainsOnly`,
+`strictAllowlist`). Two managed-only keys worth adding once you have verified them against
+the settings reference for your version: `allowManagedReadPathsOnly` and
+`sandbox.credentials` entries that mask or deny credential files.
+
 ## Notes
 
 - While the gateway credential is active, your claude.ai subscription is not used and

@@ -1,0 +1,77 @@
+# Secret, vulnerability and license scanning. All tools are permissively licensed:
+# gitleaks (MIT), OSV-Scanner (Apache-2.0), Trivy (Apache-2.0), the license audit from the AI
+# Reference repo (MIT). Pin action versions to a commit SHA before relying on this in an org.
+name: security-scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"   # weekly, catches newly published advisories
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: gitleaks (secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # scan history, not just the tip
+      # The gitleaks GitHub Action needs a license key for organisation repos; the container
+      # does not. Pin the image tag to a release.
+      - name: Scan git history
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/gitleaks/gitleaks:latest \
+            git --no-banner --redact --exit-code 1 --report-format sarif --report-path gitleaks.sarif .
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks.sarif
+          if-no-files-found: ignore
+
+  vulnerabilities:
+    name: OSV-Scanner + Trivy (dependencies, images, IaC)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: OSV-Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@v2   # pin to a tag/SHA
+        with:
+          scan-args: |
+            --recursive
+            --skip-git
+            ./
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0   # pin to a tag/SHA
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  licenses:
+    name: license audit (permissive allowlist)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch the audit script
+        # Replace with a checkout of your fork of the AI Reference repo or vendor scripts/license_audit.py.
+        run: |
+          mkdir -p .ai-reference/scripts .ai-reference/skills
+          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/<you>/ai-reference/main}/scripts/license_audit.py" -o .ai-reference/scripts/license_audit.py
+          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/<you>/ai-reference/main}/skills/community.json" -o .ai-reference/skills/community.json
+      - name: Audit
+        run: python .ai-reference/scripts/license_audit.py . --strict

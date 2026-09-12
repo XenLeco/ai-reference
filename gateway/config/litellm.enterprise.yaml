@@ -251,6 +251,12 @@ router_settings:
   # Shared state across replicas (REDIS_HOST/REDIS_PORT come from the environment)
   redis_host: os.environ/REDIS_HOST
   redis_port: os.environ/REDIS_PORT
+  # Session affinity: keep a conversation on one deployment (prompt-cache locality across
+  # replicas). LiteLLM reads x-litellm-session-id; OpenCode ≥ 1.17 sends X-Session-Id, which
+  # the Caddy front door maps (docker-compose.enterprise.yml). Verify the header name on your
+  # LiteLLM version if affinity does not take effect.
+  optional_pre_call_checks: ["session_affinity"]
+  deployment_affinity_ttl_seconds: 3600
   # Fallbacks stay within a vendor lane; never local → external, so a restricted request
   # cannot escalate to a cloud model on error.
   fallbacks:

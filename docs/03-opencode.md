@@ -116,6 +116,8 @@ This repo ships in `clients/opencode/agents/`:
 | `docs-writer` | subagent | `coder-cheap` | edit docs only | READMEs, ADRs, changelogs |
 | `security-auditor` | subagent | `coder-frontier` | read-only | OWASP/secrets/dependency review of a change |
 | `local-scout` | subagent | `coder-local` | read-only | cheap, private codebase exploration; summarises for the primary |
+| `migrator` | subagent | `coder-fast` | edit + tests + local commits; migration runners `ask` | executes a migration plan step by step with a checkpoint per step |
+| `release-manager` | subagent | `coder-fast` | edit + local commits; version tools and tags `ask` | changelog, version bump, tag commands; never pushes |
 
 And it overrides the built-ins' models in `opencode.json`: `build` → `coder-fast`,
 `plan` → `reasoning-max`, `general` → `coder-fast`, `explore` → `coder-local`.
@@ -140,7 +142,7 @@ Review these changes. Findings first, ordered by severity, with file:line.
 ```
 
 Shipped commands: `/review`, `/test`, `/commit`, `/pr`, `/explain`, `/fix`, `/docs`,
-`/plan`, `/security`. See `clients/opencode/commands/`.
+`/plan`, `/security`, `/release`, `/upgrade`. See `clients/opencode/commands/`.
 
 ## Skills
 

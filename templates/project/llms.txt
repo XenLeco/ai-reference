@@ -1,0 +1,18 @@
+# <project name>
+
+> <One sentence: what this project is and who uses it.>
+
+Agents: read AGENTS.md first; it has the commands, the map and the rules. The docs below are
+in reading order.
+
+## Docs
+
+- [AGENTS.md](AGENTS.md): commands, repository map, conventions, do-not list
+- [README](README.md): purpose and quick start
+- [Architecture](docs/architecture.md): components and data flow
+- [Contributing](docs/CONTRIBUTING.md): branch, review and release process
+
+## Optional
+
+- [ADRs](docs/adr/): decision records
+- [Runbooks](docs/runbooks/): operations

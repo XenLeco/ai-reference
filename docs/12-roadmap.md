@@ -307,10 +307,24 @@ Priority 1 landed on 2026-09-12:
 | Devcontainer template | `templates/project/.devcontainer/` |
 | claude-context in the catalogs | done in the research pass |
 
-Deferred from P1: session affinity between OpenCode's `X-Session-Id` and LiteLLM's
-`x-litellm-session-id` (needs a check on the current LiteLLM version); the daily-activity
-cache fields used by `cache-check.sh` are reported as unavailable if the running version
-does not expose them.
+Deferred from P1: the daily-activity cache fields used by `cache-check.sh` are reported as
+unavailable if the running version does not expose them.
+
+Priority 2 landed on 2026-09-12:
+
+| Item | Where |
+|---|---|
+| Model bake-off harness | `evals/bakeoff/` (`bakeoff.py`, `tasks.json`, standard library only); inspect-ai noted for heavier runs |
+| Local inference guide | `docs/13-local-inference.md` (sizing table, context window, Gemma 4 MTP drafters and engine support, engine choice) |
+| First-party skills and agents | skills `dependency-upgrade`, `migration-playbook`, `perf-profiling`, `release-notes`, `sql-review`, `api-design-review`, `incident-postmortem`; agents `migrator`, `release-manager`; commands `/release`, `/upgrade` |
+| Claude Agent SDK example | `clients/agent-sdk/nightly_triage.py` (read-only, bounded, through the gateway) |
+| `llms.txt` | repo root and `templates/project/llms.txt` |
+| Session affinity | `optional_pre_call_checks: ["session_affinity"]` in the enterprise config; Caddy maps `X-Session-Id` → `x-litellm-session-id` |
+| Key hygiene | `gateway/scripts/key-hygiene.sh` (expired and idle keys, `--delete` with confirmation) |
+
+Still open: verifying on a live LiteLLM that `x-litellm-session-id` is the affinity header
+for your version, the exact Hugging Face ids and vLLM flags for the Gemma 4 drafters, and
+the `/key/list` response shape (the hygiene script prints raw JSON if it differs).
 
 ## Suggested order of work
 

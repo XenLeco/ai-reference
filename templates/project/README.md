@@ -21,6 +21,7 @@ Copy-Item templates/project/* /path/to/repo -Recurse -Force   # PowerShell
 | `.github/PULL_REQUEST_TEMPLATE.md` | GitHub | adapt to the repo |
 | `.pre-commit-config.yaml` | pre-commit | run `pre-commit autoupdate` to pin revisions, then `pre-commit install` |
 | `.devcontainer/` | VS Code / devcontainer CLI | agent tooling preinstalled, gateway wired via `host.docker.internal`, keys from host env |
+| `llms.txt` | agents, fetch tools | reading order for the docs; edit the list |
 | `.github/workflows/security-scan.yml` | GitHub Actions | gitleaks, OSV-Scanner, Trivy, license audit; pin action SHAs |
 | `.github/workflows/ai-review.yml` | GitHub Actions | OpenCode read-only PR review via the gateway; set `LITELLM_BASE_URL` var and `LITELLM_CI_KEY` secret |
 | `.github/workflows/ai-assist.yml` | GitHub Actions | `/oc` mentions by repo members |

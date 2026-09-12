@@ -16,6 +16,7 @@ plus a few things machines need that humans forgive.
 | `opencode.json` | project-level OpenCode config: model per agent, instructions, permissions |
 | `.mcp.json` | MCP servers for Claude Code / Cursor (OpenCode reads its own `mcp` block) |
 | `.editorconfig` | consistent whitespace so agent edits do not produce noise diffs |
+| `llms.txt` | reading order for agents and fetch tools; edit the doc list |
 | `.agents/skills/` | project-specific skills (empty by default) |
 
 Copy, then edit `AGENTS.md`. Nothing else needs changes to start.

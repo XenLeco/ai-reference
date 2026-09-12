@@ -76,6 +76,10 @@ defaults to Qwen and `local-small` to Gemma.
 | Qwen3-Coder-480B-A35B-Instruct | 480B MoE, 35B active | 256K native, 1M with extrapolation | `qwen3-coder:480b` (~290 GB q4) | Server class. Use hosted (OpenRouter, vendor APIs) unless you own the hardware. |
 | Qwen3-Coder-Next | 80B-A3B base, hybrid attention | 256K | not on Ollama at verification time; vLLM or hosted | Newest line; verify availability before aliasing. |
 
+Hardware sizing, quantisation, the Ollama context-window setting and speculative decoding
+for the local rungs are in doc 13. `evals/bakeoff/bakeoff.py` compares aliases on your own
+tasks.
+
 ## Selecting a model: the questions
 
 1. **Is the data allowed to leave the machine?** No → `coder-local` / `local-small` only

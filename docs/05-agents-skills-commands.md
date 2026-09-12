@@ -62,6 +62,13 @@ Skills in this repo (`skills/`):
 | `model-selection` | choosing which alias to use, cost questions | the ladder from doc 01 |
 | `repo-onboarding` | a repo has no `AGENTS.md`, or "explain this codebase" | produces an `AGENTS.md` draft |
 | `enterprise-compliance-gate` | enterprise profile only: before sending data to a non-local model | classification questions, escalation |
+| `dependency-upgrade` | bumps, advisories | audit → staged bumps → tests per group |
+| `migration-playbook` | migrations, renames, contract changes | expand → migrate → contract; rollback per step |
+| `perf-profiling` | slow, memory, "optimise" | measure → hypothesis → one change → re-measure |
+| `release-notes` | releases, changelog | grouped by impact, breaking first |
+| `sql-review` | queries, migrations, ORM | correctness, injection, indexes, unsafe DDL |
+| `api-design-review` | endpoints, public surfaces | evolvability, errors, security |
+| `incident-postmortem` | after incidents | blameless template with owned actions |
 
 Validate with `scripts/validate.sh` (checks frontmatter and folder/name match). The
 reference validator is `skills-ref validate ./skill` from the agentskills repo.

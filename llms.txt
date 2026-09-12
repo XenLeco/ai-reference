@@ -1,0 +1,35 @@
+# AI Reference
+
+> A reference repository for adopting AI coding agents: a LiteLLM gateway as the single entry point, OpenCode as the primary client (Claude Code, Codex, Cursor, Gemini CLI wired to the same gateway), tool-agnostic context (AGENTS.md, Agent Skills, MCP), and personal and enterprise profiles. Everything recommended is permissively licensed.
+
+Start with the overview, then the doc that matches the task. Config files carry comments explaining why; JSON files are explained in the sibling README.
+
+## Core docs
+
+- [Overview and architecture](docs/00-overview.md): the three layers and the design principles
+- [Models](docs/01-models.md): the alias ladder, vendor catalog, selection questions
+- [Gateway](docs/02-gateway-litellm.md): LiteLLM config anatomy, routing, keys, observability
+- [OpenCode](docs/03-opencode.md): config precedence, provider block, agents, commands, skills, MCP, permissions
+- [Other clients](docs/04-other-clients.md): Claude Code, Codex, Cursor, Gemini CLI, SDKs through the gateway
+- [Agents, skills, commands](docs/05-agents-skills-commands.md): design rules and the eval workflow
+- [Repository conventions](docs/06-repo-conventions.md): making any repo AI-ready
+- [Security and privacy](docs/07-security-privacy.md): threat model, sandboxing, prompt injection, incidents
+- [Enterprise profile](docs/08-enterprise-profile.md): policy, controls, compliance mapping, rollout
+- [Workflows](docs/09-workflows.md): day-to-day playbooks
+- [Troubleshooting](docs/10-troubleshooting.md)
+- [Community skills](docs/11-community-skills.md): license and safety gates, verdicts on third-party tools
+- [Roadmap](docs/12-roadmap.md): researched backlog and status
+- [Local inference](docs/13-local-inference.md): hardware sizing, context window, speculative decoding
+
+## Configuration
+
+- [Personal gateway config](gateway/config/litellm.personal.yaml)
+- [Enterprise gateway config](gateway/config/litellm.enterprise.yaml)
+- [OpenCode global config](clients/opencode/opencode.json)
+- [Project template AGENTS.md](templates/project/AGENTS.md)
+
+## Optional
+
+- [ADRs](docs/adr/0001-gateway-single-entrypoint.md): decision records
+- [Skills catalog](skills/community.json): vetted third-party tools with licenses and safety properties
+- [MCP catalog](mcp/catalog.json)

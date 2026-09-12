@@ -58,7 +58,9 @@ services:
     ports:
       - "443:443"
       - "80:80"
-    command: ["caddy", "reverse-proxy", "--from", "${GATEWAY_HOSTNAME:-gateway.example.internal}", "--to", "litellm:4000"]
+    # --header-up maps OpenCode's X-Session-Id to the header LiteLLM's session affinity reads
+    command: ["caddy", "reverse-proxy", "--from", "${GATEWAY_HOSTNAME:-gateway.example.internal}", "--to", "litellm:4000",
+              "--header-up", "x-litellm-session-id: {http.request.header.X-Session-Id}"]
     volumes:
       - caddy_data:/data
 

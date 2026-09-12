@@ -53,12 +53,16 @@ Then run `opencode` in that repo, type `/models`, pick `coder-fast`. Everything 
 | [docs/10-troubleshooting.md](docs/10-troubleshooting.md) | Known failure modes and fixes |
 | [docs/11-community-skills.md](docs/11-community-skills.md) | Third-party tools that cut consumption (Serena, code graphs, beads) or sharpen decisions (superpowers, spec-kit, compound-engineering, AI-DLC); vetting checklist, recommended stacks |
 | [docs/12-roadmap.md](docs/12-roadmap.md) | Researched backlog: what to add next, prioritised, each item checked against the license and safety gates |
+| [docs/13-local-inference.md](docs/13-local-inference.md) | Local models: hardware sizing, quantisation, context window, speculative decoding, engine choice |
 | [docs/adr/](docs/adr/) | Decision records for the non-obvious choices |
 | [gateway/](gateway/) | LiteLLM: compose files, `litellm.personal.yaml`, `litellm.enterprise.yaml`, scripts |
 | [clients/opencode/](clients/opencode/) | Global `opencode.json`, agents, commands (installed to `~/.config/opencode/`) |
 | [clients/claude-code/](clients/claude-code/) · [codex/](clients/codex/) · [cursor/](clients/cursor/) · [gemini-cli/](clients/gemini-cli/) · [sdk/](clients/sdk/) | Per-client gateway wiring |
+| [llms.txt](llms.txt) | Reading order for agents and fetch tools (the project template ships one too) |
 | [skills/](skills/) | Portable skills (Agent Skills spec), installed to `~/.agents/skills`; `community.json` catalogs vetted third-party ones |
 | [evals/promptfoo/](evals/promptfoo/) | Regression evals for the skills and agents, run through the gateway with promptfoo (`scripts/evals.sh`) |
+| [evals/bakeoff/](evals/bakeoff/) | Model bake-off: same tasks across aliases, pass rate / latency / tokens, standard library only |
+| [clients/agent-sdk/](clients/agent-sdk/) | Claude Agent SDK (MIT) example for scheduled read-only automations through the gateway |
 | [mcp/](mcp/) | MCP server catalog and per-client declaration formats |
 | [templates/project/](templates/project/) | Drop-in files for any repo (`AGENTS.md`, `opencode.json`, `.mcp.json`, …) |
 | [templates/enterprise/](templates/enterprise/) | Policy file, managed settings, stricter project config |

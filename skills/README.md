@@ -16,6 +16,13 @@ project. Design rules: [docs/05-agents-skills-commands.md](../docs/05-agents-ski
 | `model-selection` | which model, cost, "is this worth Opus" | both |
 | `repo-onboarding` | new repo, "explain this codebase", missing `AGENTS.md` | both |
 | `enterprise-compliance-gate` | before sending code/data to a non-local model in company repos | enterprise |
+| `dependency-upgrade` | bump, upgrade, audit findings, advisories | both |
+| `migration-playbook` | schema/data migrations, renames, API versions, framework majors | both |
+| `perf-profiling` | slow, memory, timeouts, "optimise" | both |
+| `release-notes` | changelog, release, "what changed since" | both |
+| `sql-review` | queries, migrations, ORM code, slow query | both |
+| `api-design-review` | new or changed endpoints, public functions, event schemas | both |
+| `incident-postmortem` | after an outage or incident, RCA, post-incident review | both |
 
 Validate: `scripts/validate.sh` (frontmatter, folder/name match, description length).
 Write a new one by copying the smallest existing skill; keep `SKILL.md` under 200 lines.

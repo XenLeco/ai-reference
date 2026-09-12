@@ -18,6 +18,7 @@ for the design and [docs/08-enterprise-profile.md](../docs/08-enterprise-profile
 | `scripts/spend-report.{sh,ps1}` | spend by key/team and per-model usage for the last N days (`/global/spend/report`, `/user/daily/activity`) |
 | `scripts/cache-check.sh` | prompt-cache hit rate per model; flags agent models below 20% |
 | `scripts/backup-db.{sh,ps1}` | `pg_dump` of keys, teams and spend with rotation; restore line in the header |
+| `scripts/key-hygiene.sh` | lists keys, flags expired and idle ones (no spend in N days), `--delete` removes them after confirmation |
 
 ## Run (personal)
 

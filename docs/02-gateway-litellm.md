@@ -116,6 +116,13 @@ Strategies: `simple-shuffle` (default; weighted random, lowest overhead), `least
 `latency-based-routing`, `usage-based-routing-v2` (needs Redis), `cost-based-routing`.
 For a single-user gateway the strategy is irrelevant; fallbacks are what matter.
 
+**Auto-routing by complexity** is a different mechanism: the `auto-coder` alias
+(`auto_router/complexity_router`, beta) classifies each request as SIMPLE / MEDIUM /
+COMPLEX / REASONING with a heuristic scorer (no API call) and maps the tier to
+`coder-local` / `coder-cheap` / `coder-fast` / `coder-frontier`, with session affinity.
+It is opt-in for the reasons in ADR-0002; measure it with `spend-report.sh` before using
+it widely.
+
 Fallback semantics: on a retriable error (429, 5xx, timeout) the router retries the same
 deployment `num_retries` times with backoff, then walks the fallback list left to right.
 `context_window_fallbacks` fires only on context-length errors. `content_policy_fallbacks`
@@ -198,8 +205,15 @@ Ollama is better for one person.
 ## Observability
 
 - **Spend logs** in Postgres; `/ui` shows per-key/team/model spend and request logs.
-- **Callbacks**: `langfuse` (self-hostable, traces + prompts) or `otel` (OpenTelemetry to any
-  collector) are the open options. `prometheus` requires a LiteLLM enterprise license.
+  `scripts/spend-report.sh` prints the same per key/team and per model for the last N days;
+  `scripts/cache-check.sh` prints the prompt-cache hit rate per model and flags agent
+  models under 20%; `scripts/backup-db.sh` dumps the database with rotation.
+- **Traces**: `docker-compose.observability.yml` adds Jaeger (Apache-2.0) fed by the
+  `otel` callback: one trace per request with model, tokens, latency, key and tags.
+- **Callbacks**: `otel` (OpenTelemetry to any collector) and `langfuse` (self-hostable,
+  MIT core; its reference stack includes MinIO under AGPL, so pick a permissive
+  S3-compatible store) are the open options. `prometheus` requires a LiteLLM enterprise
+  license.
 - **Alerting**: `general_settings.alerting: ["slack"]` with `SLACK_WEBHOOK_URL` for budget
   and outage alerts.
 - For coding agents, disable response caching (`cache: false`); identical prompts are rare and

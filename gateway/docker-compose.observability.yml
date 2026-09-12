@@ -1,0 +1,46 @@
+# Observability overlay: traces for every gateway request (model, tokens, latency, key, tags)
+# in Jaeger, via LiteLLM's OpenTelemetry callback. Both components are Apache-2.0.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d
+#   open http://localhost:16686  (service "litellm")
+#
+# Personal profile: set   litellm_settings.callbacks: ["otel"]   in config/litellm.personal.yaml
+# (one line; without an endpoint the callback would log spans to the console, so it is off by
+# default). The enterprise config already has the callback; point OTEL_EXPORTER_OTLP_ENDPOINT at
+# the org collector instead of this Jaeger.
+#
+# Richer LLM-specific views (sessions, prompt versions, cost dashboards): Langfuse (MIT core)
+# with LiteLLM's `langfuse` callback. It is not bundled here because its reference stack
+# includes MinIO (AGPL-3.0); use an S3-compatible store that passes the license gate (for
+# example SeaweedFS, Apache-2.0) or a cloud bucket, and follow langfuse.com/self-hosting.
+
+services:
+  litellm:
+    environment:
+      OTEL_EXPORTER: otlp_http
+      OTEL_ENDPOINT: http://jaeger:4318/v1/traces
+      OTEL_SERVICE_NAME: litellm
+    depends_on:
+      jaeger:
+        condition: service_started
+
+  jaeger:
+    image: jaegertracing/jaeger:2.9.0        # Jaeger v2 all-in-one accepts OTLP directly; pin as needed
+    container_name: litellm-jaeger
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:16686:16686"   # UI
+    expose:
+      - "4317"   # OTLP gRPC
+      - "4318"   # OTLP HTTP
+    volumes:
+      - jaeger_data:/badger
+    environment:
+      # in-memory storage by default; badger keeps traces across restarts on this volume
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "false"
+      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_KEY: /badger/key
+
+volumes:
+  jaeger_data: {}

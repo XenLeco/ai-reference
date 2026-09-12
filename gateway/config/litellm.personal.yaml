@@ -240,6 +240,30 @@ model_list:
       input_cost_per_token: 0
       output_cost_per_token: 0
 
+  # ----------------------------------------------------------------------------
+  # Opt-in: auto-routing by request complexity (LiteLLM complexity router, beta).
+  # The heuristic classifier (token count, code presence, reasoning markers) costs no API
+  # call and sends each request to a tier. Session affinity keeps a conversation on one
+  # tier. Not the default: mixed models inside an agent session weaken prompt caching and
+  # consistency (ADR-0002). Use it for chat-like or batch traffic, or as a deliberate
+  # "cheap first" mode; measure with gateway/scripts/spend-report.sh before widening it.
+  # ----------------------------------------------------------------------------
+  - model_name: auto-coder
+    litellm_params:
+      model: auto_router/complexity_router
+      complexity_router_config:
+        tiers:
+          SIMPLE: coder-local
+          MEDIUM: coder-cheap
+          COMPLEX: coder-fast
+          REASONING: coder-frontier
+        classifier_type: heuristic
+        session_affinity: true
+      complexity_router_default_model: coder-fast
+    model_info:
+      role: auto-coder
+      resolves_to: "coder-local | coder-cheap | coder-fast | coder-frontier by complexity"
+
 # ==============================================================================
 # Optional: MCP gateway. Register shared/remote MCP servers once and point every client at
 # <gateway>/mcp with the virtual key (docs/12 §A). Uncomment to use.

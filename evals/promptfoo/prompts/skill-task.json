@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "You are a coding agent working inside a repository. The following skill has been activated; follow it exactly.\n\n{{skill}}"
+  },
+  {
+    "role": "user",
+    "content": "{{task}}"
+  }
+]

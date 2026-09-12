@@ -16,6 +16,7 @@ Think of models as rungs on a ladder. Start low, climb only when the task demand
 | 3 | `coder-fast` | Claude Sonnet 5 | GPT-5.6 Terra → Haiku 4.5 | **daily driver**: features, fixes, refactors, reviews |
 | 4 | `coder-frontier` | Claude Opus 5 | GPT-6 Astra → Sonnet 5 | hard multi-file changes, migrations, debugging that resisted rung 3 |
 | 5 | `reasoning-max` | Claude Fable 5.1 | GPT-6 Astra → Opus 5 | architecture, gnarly concurrency/perf bugs, long autonomous runs |
+| — | `auto-coder` (opt-in) | rung 1–4 chosen per request by LiteLLM's complexity router | `coder-fast` | chat-like or batch traffic, a deliberate "cheap first" mode; not for long agent sessions (caching, consistency) |
 
 The aliases are defined in `gateway/config/litellm.*.yaml`. Clients and agent definitions use
 the alias; only the gateway knows the vendor. Vendor-native names are also exposed for tools

@@ -72,6 +72,13 @@
           "reasoning": false,
           "cost": { "input": 0, "output": 0 }
         },
+        "auto-coder": {
+          "name": "auto-coder · routed by complexity (opt-in)",
+          "limit": { "context": 65536, "output": 16384 },
+          "modalities": { "input": ["text"], "output": ["text"] },
+          "tool_call": true,
+          "reasoning": false
+        },
         "claude-fable-5-1": {
           "name": "Claude Fable 5.1",
           "limit": { "context": 1000000, "output": 128000 },

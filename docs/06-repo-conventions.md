@@ -28,7 +28,11 @@ Copy, then edit `AGENTS.md`. Nothing else needs changes to start.
 - **A fast test path** (< 30 s) separate from the full suite. Agents iterate; a 10-minute
   suite means they stop running tests.
 - **Deterministic setup**: a devcontainer, `mise`/`asdf` `.tool-versions`, or a lockfile
-  plus a one-line install. "Works on my machine" is fatal for an agent.
+  plus a one-line install. "Works on my machine" is fatal for an agent. The template ships
+  `.devcontainer/` (spec and images are MIT): Node, Python, `gh`, OpenCode, `uv`,
+  pre-commit and the sandbox runtime preinstalled; the gateway reached at
+  `host.docker.internal:4000`; your OpenCode config and skills mounted read-only; keys
+  passed from the host environment, never baked into the image.
 - **Small modules, explicit boundaries.** Agents read files whole; a 3,000-line file is
   read badly or not at all.
 - **Types and tests as specification.** Typed signatures and existing tests are the most

@@ -58,6 +58,7 @@ Then run `opencode` in that repo, type `/models`, pick `coder-fast`. Everything 
 | [clients/opencode/](clients/opencode/) | Global `opencode.json`, agents, commands (installed to `~/.config/opencode/`) |
 | [clients/claude-code/](clients/claude-code/) · [codex/](clients/codex/) · [cursor/](clients/cursor/) · [gemini-cli/](clients/gemini-cli/) · [sdk/](clients/sdk/) | Per-client gateway wiring |
 | [skills/](skills/) | Portable skills (Agent Skills spec), installed to `~/.agents/skills`; `community.json` catalogs vetted third-party ones |
+| [evals/promptfoo/](evals/promptfoo/) | Regression evals for the skills and agents, run through the gateway with promptfoo (`scripts/evals.sh`) |
 | [mcp/](mcp/) | MCP server catalog and per-client declaration formats |
 | [templates/project/](templates/project/) | Drop-in files for any repo (`AGENTS.md`, `opencode.json`, `.mcp.json`, …) |
 | [templates/enterprise/](templates/enterprise/) | Policy file, managed settings, stricter project config |

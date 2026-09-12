@@ -1,0 +1,58 @@
+# promptfoo evals for the OpenCode agents in clients/opencode/agents/, executed for real with
+# `opencode run --agent <name> --dir fixtures/mini-repo` through the exec provider.
+# Needs OpenCode installed with this repo's global config (scripts/install-personal.sh) and
+# LITELLM_API_KEY set. Run: scripts/evals.sh --agents
+description: AI Reference — agent evals (opencode run)
+
+providers:
+  - id: "exec: python3 providers/opencode_run.py"
+    label: opencode-run
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:coder-cheap
+      config:
+        apiBaseUrl: http://localhost:4000/v1
+        apiKeyEnvar: LITELLM_API_KEY
+        temperature: 0
+
+prompts:
+  - "{{task}}"
+
+tests:
+  - description: local-scout — locates the discount logic and returns the fixed shape
+    vars:
+      agent: local-scout
+      task: "Where is the order discount calculated, and what does that function call? Answer in your standard shape."
+    assert:
+      - type: icontains
+        value: "## Where"
+      - type: regex
+        value: "pricing\\.py:\\d+"
+      - type: icontains
+        value: "line_total"
+
+  - description: reviewer — read-only review of pricing.py finds the planted defects
+    vars:
+      agent: reviewer
+      task: "Review the file src/pricing.py in this repository (read it with cat). Report in your standard shape."
+    assert:
+      - type: icontains
+        value: "Blockers"
+      - type: regex
+        value: "pricing\\.py:\\d+"
+      - type: llm-rubric
+        value: The review identifies the loop that starts at index 1 and skips the first item, and the bare except that swallows errors.
+
+  - description: architect — returns options, a recommendation and an ordered plan
+    vars:
+      agent: architect
+      task: "Plan adding percentage and fixed-amount coupon codes to order pricing in this repository. Keep it small."
+    assert:
+      - type: icontains
+        value: "## Options"
+      - type: icontains
+        value: "## Plan"
+      - type: icontains
+        value: "## Risks"

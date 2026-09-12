@@ -125,6 +125,12 @@ can cost thousands of tokens per turn. Enable per agent, not globally. Catalog i
 
 ## Testing your configuration
 
+- **Regression evals**: `scripts/evals.sh` runs the promptfoo suite in `evals/promptfoo/`
+  through the gateway. Every skill has fixture tasks with shape assertions (valid commit
+  subject, `path:line`, required sections), safety assertions (a planted secret must not
+  appear) and one `llm-rubric` per test graded on `coder-cheap`. `--agents` also runs the
+  OpenCode agents for real against `fixtures/mini-repo`. Run it whenever `AGENTS.md`, a
+  skill, an agent or an alias mapping changes.
 - New skill: ask a question that should trigger it and one that should not; check the
   session log to see whether it loaded.
 - New agent: run it on a known task with a known good answer; compare cost in the gateway UI.

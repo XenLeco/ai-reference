@@ -6,6 +6,11 @@
 *.pem
 gateway/data/
 gateway/.litellm/
+gateway/backups/
+
+# promptfoo local state
+evals/promptfoo/.promptfoo/
+evals/promptfoo/output/
 
 # OS / editor noise
 .DS_Store

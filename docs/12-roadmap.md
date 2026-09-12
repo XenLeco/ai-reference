@@ -296,6 +296,22 @@ Note on the trailer: the kernel's documented format is now `Assisted-by: LLM [to
 without model names (the July 2026 simplification); the model and client go in the
 separate `AI-Tool:` trailer where a policy needs them.
 
+Priority 1 landed on 2026-09-12:
+
+| Item | Where |
+|---|---|
+| promptfoo eval suite | `evals/promptfoo/` (skills suite through the gateway, agents suite via `opencode run`, fixtures with planted defects), `scripts/evals.{sh,ps1}` |
+| Auto-routing alias | `auto-coder` in `litellm.personal.yaml` and `clients/opencode/opencode.json`; doc 01 ladder, doc 02 |
+| Spend, cache-hit, backup scripts | `gateway/scripts/spend-report.{sh,ps1}`, `cache-check.sh`, `backup-db.{sh,ps1}` |
+| Observability overlay | `gateway/docker-compose.observability.yml` (Jaeger, Apache-2.0, fed by the `otel` callback). Langfuse documented, not bundled: its reference stack includes MinIO (AGPL-3.0) |
+| Devcontainer template | `templates/project/.devcontainer/` |
+| claude-context in the catalogs | done in the research pass |
+
+Deferred from P1: session affinity between OpenCode's `X-Session-Id` and LiteLLM's
+`x-litellm-session-id` (needs a check on the current LiteLLM version); the daily-activity
+cache fields used by `cache-check.sh` are reported as unavailable if the running version
+does not expose them.
+
 ## Suggested order of work
 
 1. **Gate tooling and isolation** (P0, about two days): license-audit script, gitleaks +

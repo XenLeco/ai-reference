@@ -12,8 +12,12 @@ for the design and [docs/08-enterprise-profile.md](../docs/08-enterprise-profile
 | `.env.example` | every variable the configs read; copy to `.env` |
 | `config/litellm.personal.yaml` | aliases, vendor models, local models, fallbacks |
 | `config/litellm.enterprise.yaml` | allowlist, access groups, tag routing, guardrails, logging off |
+| `docker-compose.observability.yml` | overlay: Jaeger (Apache-2.0) receiving LiteLLM's OpenTelemetry traces; UI on :16686 |
 | `scripts/smoke-test.{sh,ps1}` | exercises `/health`, `/v1/models`, chat, responses, messages |
-| `scripts/create-key.{sh,ps1}` | issues a virtual key with alias, budget, duration, models/tags |
+| `scripts/create-key.{sh,ps1}` | issues a virtual key with alias, budget, duration, models/tags, MCP servers |
+| `scripts/spend-report.{sh,ps1}` | spend by key/team and per-model usage for the last N days (`/global/spend/report`, `/user/daily/activity`) |
+| `scripts/cache-check.sh` | prompt-cache hit rate per model; flags agent models below 20% |
+| `scripts/backup-db.{sh,ps1}` | `pg_dump` of keys, teams and spend with rotation; restore line in the header |
 
 ## Run (personal)
 
@@ -45,6 +49,24 @@ docker compose -f docker-compose.yml -f docker-compose.enterprise.yml up -d
 Port 4000 binds to localhost only; put a TLS reverse proxy (Caddy, nginx, the org ingress)
 in front, with SSO on `/ui`. Provide `PRESIDIO_*`, `OTEL_*`, `SLACK_WEBHOOK_URL` and the
 database URL from the org vault instead of `.env`.
+
+## Observability
+
+```bash
+# one line in config/litellm.personal.yaml:  litellm_settings.callbacks: ["otel"]
+docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d
+open http://localhost:16686        # Jaeger: one trace per request with model, tokens, latency, key, tags
+```
+
+Langfuse (MIT core) gives LLM-specific views but its reference stack includes MinIO
+(AGPL-3.0), so it is documented, not bundled; see the overlay's header.
+
+## Auto-routing (opt-in)
+
+`auto-coder` in the personal config routes each request by complexity (heuristic
+classifier, no API call) to `coder-local` / `coder-cheap` / `coder-fast` / `coder-frontier`
+with session affinity. Select it in `/models` when you want "cheap first"; it is not the
+default because mixed models within an agent session weaken caching and consistency.
 
 ## Admin UI
 

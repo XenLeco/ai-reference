@@ -22,8 +22,9 @@ It contains no application code. Its artifacts are documentation, configuration 
 ## Commands
 
 ```bash
-./scripts/validate.sh            # lint JSON/YAML/TOML, check skill frontmatter (bash)
+./scripts/validate.sh            # lint JSON/YAML/TOML, check skill frontmatter, license gate (bash)
 pwsh ./scripts/validate.ps1      # same on Windows
+./scripts/evals.sh [--agents]    # promptfoo regression evals through the gateway (needs LITELLM_API_KEY)
 cd gateway && docker compose config   # validate compose files
 ```
 

@@ -68,10 +68,10 @@ jobs:
         with:
           node-version: "22"
       - name: Fetch the audit script
-        # Replace with a checkout of your fork of the AI Reference repo or vendor scripts/license_audit.py.
+        # Point AI_REFERENCE_RAW at your fork (or vendor scripts/license_audit.py) if the repo is private.
         run: |
           mkdir -p .ai-reference/scripts .ai-reference/skills
-          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/<you>/ai-reference/main}/scripts/license_audit.py" -o .ai-reference/scripts/license_audit.py
-          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/<you>/ai-reference/main}/skills/community.json" -o .ai-reference/skills/community.json
+          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/XenLeco/ai-reference/main}/scripts/license_audit.py" -o .ai-reference/scripts/license_audit.py
+          curl -fsSL "${AI_REFERENCE_RAW:-https://raw.githubusercontent.com/XenLeco/ai-reference/main}/skills/community.json" -o .ai-reference/skills/community.json
       - name: Audit
         run: python .ai-reference/scripts/license_audit.py . --strict

@@ -201,6 +201,26 @@
       "enterprise": "allowed",
       "notes": "Pairs with the architect and docs-writer agents; check generated HTML loads no remote assets"
     },
+    "i-have-adhd": {
+      "repo": "https://github.com/ayghri/i-have-adhd",
+      "category": "output-shaping",
+      "purpose": "Ten-rule ruleset that makes responses action-first: lead with the next action, number steps (one bounded action each), end with one concrete next step, restate state across turns, cap lists, no preamble or closers. On demand via /i-have-adhd, or always-on via a flag file.",
+      "tier": "instructions",
+      "license": "MIT",
+      "install": {
+        "all-agents": ["npx -y skills add ayghri/i-have-adhd -g -y"],
+        "claude-code": ["claude plugin marketplace add ayghri/i-have-adhd", "claude plugin install i-have-adhd@i-have-adhd", "always-on: touch ~/.claude/.i-have-adhd-always"],
+        "opencode": ["git clone https://github.com/ayghri/i-have-adhd ~/.config/opencode/vendor/i-have-adhd", "opencode.json: \"plugin\": [\"~/.config/opencode/vendor/i-have-adhd/.opencode/plugins/i-have-adhd.mjs\"] (absolute path; pin the clone to a commit)", "always-on: touch ~/.config/opencode/.i-have-adhd-always"],
+        "codex": ["codex plugin marketplace add ayghri/i-have-adhd --ref main", "codex plugin add i-have-adhd@i-have-adhd"],
+        "cursor": ["npx skills add ayghri/i-have-adhd"]
+      },
+      "commands": ["/i-have-adhd (Codex: $i-have-adhd)", "stop adhd mode / normal mode"],
+      "safety": { "executes_code": "on demand: none. always-on: Claude Code SessionStart hook (node/sh, reads flag file + SKILL.md, prints text) or OpenCode plugin .mjs (config + experimental.chat.system.transform; node built-ins only) — reviewed 2026-09-13", "hooks": "only in always-on mode", "always_on": "optional (flag file)", "outbound_network": "none", "telemetry": "none", "writes_instruction_files": false, "writes": ["flag file you create; nothing else"] },
+      "overhead_note": "always-on injects the ~380-line ruleset every turn (~2-3k tokens); on demand costs nothing until invoked",
+      "personal": "recommended-on-demand",
+      "enterprise": "allowed-pinned",
+      "notes": "Complements AGENTS.md communication rules; AGENTS.md wins on conflict. Its list cap and per-turn restating can fight subagent output shapes (reviewer, architect): use it in the primary conversation, not for subagents. Unrelated to caveman: this shapes actionability, not token count."
+    },
     "ponytail": {
       "repo": "https://github.com/DietrichGebert/ponytail",
       "category": "restraint",

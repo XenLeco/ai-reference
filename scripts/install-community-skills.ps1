@@ -6,8 +6,8 @@
 .DESCRIPTION
   Retrieval / graphs / memory: -Serena -Graphify -CodeReviewGraph -Beads
   Methodology:                 -Superpowers -SpecKit [-SpecKitRef vX.Y.Z] -Compound -Aidlc
-  Other:                       -Archify -Ponytail
-  -Recommended = -Serena -CodeReviewGraph -Beads -SpecKit -Archify (no plugins, no methodology pack)
+  Other:                       -Archify -Ponytail -IHaveAdhd
+  -Recommended = -Serena -CodeReviewGraph -Beads -SpecKit -Archify -IHaveAdhd (no plugins, no methodology pack)
   Plugin-based tools (superpowers, compound, ponytail) print the in-client commands.
 .EXAMPLE
   ./install-community-skills.ps1 -Recommended -SpecKitRef v0.9.0
@@ -15,11 +15,11 @@
 param(
   [switch]$Serena, [switch]$Graphify, [switch]$CodeReviewGraph, [switch]$Beads,
   [switch]$Superpowers, [switch]$SpecKit, [string]$SpecKitRef = "", [switch]$Compound, [switch]$Aidlc,
-  [switch]$Archify, [switch]$Ponytail, [switch]$Recommended
+  [switch]$Archify, [switch]$Ponytail, [switch]$IHaveAdhd, [switch]$Recommended
 )
 $ErrorActionPreference = "Stop"
-if ($Recommended) { $Serena = $CodeReviewGraph = $Beads = $SpecKit = $Archify = $true }
-if (-not ($Serena -or $Graphify -or $CodeReviewGraph -or $Beads -or $Superpowers -or $SpecKit -or $Compound -or $Aidlc -or $Archify -or $Ponytail)) {
+if ($Recommended) { $Serena = $CodeReviewGraph = $Beads = $SpecKit = $Archify = $IHaveAdhd = $true }
+if (-not ($Serena -or $Graphify -or $CodeReviewGraph -or $Beads -or $Superpowers -or $SpecKit -or $Compound -or $Aidlc -or $Archify -or $Ponytail -or $IHaveAdhd)) {
   Get-Help $PSCommandPath -Detailed; exit 1
 }
 
@@ -111,6 +111,17 @@ if ($Archify) {
   Hr "archify (validated diagrams; skill + Node renderer)"
   Need npx "install Node.js"
   npx -y skills add tt-a1i/archify -g -y
+}
+
+if ($IHaveAdhd) {
+  Hr "i-have-adhd (action-first output ruleset; on demand via /i-have-adhd)"
+  Need npx "install Node.js"
+  npx -y skills add ayghri/i-have-adhd -g -y
+  Write-Host "  Always-on (optional; injects the ruleset every turn):"
+  Write-Host "    OpenCode:    git clone https://github.com/ayghri/i-have-adhd $HOME\.config\opencode\vendor\i-have-adhd ; add the absolute path of .opencode\plugins\i-have-adhd.mjs to `"plugin`" in opencode.json ; New-Item $HOME\.config\opencode\.i-have-adhd-always"
+  Write-Host "    Claude Code: claude plugin marketplace add ayghri/i-have-adhd ; claude plugin install i-have-adhd@i-have-adhd ; New-Item $HOME\.claude\.i-have-adhd-always"
+  Write-Host "    Codex:       codex plugin marketplace add ayghri/i-have-adhd --ref main ; codex plugin add i-have-adhd@i-have-adhd"
+  Write-Host "  Turn off for a session: say 'stop adhd mode'. AGENTS.md wins on conflict."
 }
 
 if ($Ponytail) {

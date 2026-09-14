@@ -121,6 +121,7 @@ packs replace it for bigger work, they do not sit on top.
 | memory across sessions | **beads** when work spans days or agents | beads (repo-local data, MIT) |
 | diagrams | archify | archify |
 | scope restraint | ponytail (try) | ponytail after plugin review |
+| output shaping | i-have-adhd on demand (`/i-have-adhd`), always-on if it helps you | i-have-adhd, pinned clone for always-on |
 | excluded | caveman, oh-my-openagent | caveman, oh-my-openagent |
 
 ## Installing: the `skills` CLI and alternatives
@@ -372,6 +373,49 @@ pin; `/ponytail-review` alone can be adopted by copying its checklist into a pro
 
 ---
 
+## Part C — shaping the output
+
+### i-have-adhd — action-first responses · MIT
+
+**What.** A ten-rule ruleset (an Agent Skill, `skills/i-have-adhd/SKILL.md`, ~380 lines)
+that makes every response actionable for a reader who loses the thread easily: lead with
+the next action (command, path or snippet first), number multi-step work with one bounded
+action per step, end with one concrete next step, restate where you are each turn, cap
+lists at five, drop preamble, recaps and closers, state errors plainly. It has explicit
+exceptions for explanations, destructive actions and ambiguity. Invoke on demand with
+`/i-have-adhd` (`$i-have-adhd` in Codex), or make it always-on with a flag file; `stop adhd
+mode` / `normal mode` turns it off for the session.
+
+**Install.** On demand, any agent: `npx skills add ayghri/i-have-adhd -g`. Claude Code
+plugin: `claude plugin marketplace add ayghri/i-have-adhd` then `claude plugin install
+i-have-adhd@i-have-adhd`; always-on: `touch ~/.claude/.i-have-adhd-always`. OpenCode:
+clone the repo (for example into `~/.config/opencode/vendor/i-have-adhd`), add the
+absolute path of `.opencode/plugins/i-have-adhd.mjs` to `plugin` in `opencode.json`;
+always-on: `touch ~/.config/opencode/.i-have-adhd-always`. Codex: `codex plugin
+marketplace add ayghri/i-have-adhd --ref main`, `codex plugin add i-have-adhd@i-have-adhd`.
+
+**Safety.** Reviewed on 2026-09-13. On demand it is instructions only. Always-on adds a
+Claude Code `SessionStart` hook (a shell/Node script that checks the flag file, reads
+`SKILL.md` and prints it) or an OpenCode plugin (`config` and
+`experimental.chat.system.transform` hooks; Node built-ins only). No network, no shell
+execution, no telemetry, no writes beyond the flag file you create. The `scripts/`
+directory holds the maintainer's eval tooling and is not installed. Cost: always-on
+injects the ruleset every turn (roughly 2–3k tokens); on demand costs nothing until used.
+
+**Fit.** The rules agree with this repo's own communication rules (`clients/opencode/AGENTS.md`:
+findings before narrative, one question at a time) and add discipline to long sessions:
+the "restate state every turn" rule is what makes a multi-hour agent run followable.
+Two frictions: the five-item cap and per-turn restating can collide with subagent output
+shapes (the reviewer's findings list, the architect's plan), so run it in the primary
+conversation rather than for subagents; and, as with every ruleset, `AGENTS.md` wins on
+conflict. It is unrelated to caveman: this shapes *actionability*, not token count.
+
+**Verdict.** Personal: **recommended on demand**; always-on if the style helps you, and
+the installer prints the flag command. Enterprise: **allowed**, cloned at a pinned commit
+for the always-on plugin; on-demand needs no review beyond reading the skill.
+
+---
+
 ## Excluded
 
 Listed so nobody re-evaluates them from scratch. They stay in `skills/community.json` under
@@ -399,6 +443,7 @@ Listed so nobody re-evaluates them from scratch. They stay in `skills/community.
 | AI-DLC | methodology (lifecycle) | MIT-0 | runtime + hooks | none | optional | strong candidate, vendored |
 | archify | diagrams | MIT | skill + renderer | none | recommended | allowed |
 | ponytail | scope restraint | MIT | plugin, always-on | none | try | review as plugin |
+| i-have-adhd | output shaping | MIT | instructions (always-on: small hook/plugin) | none | recommended on demand | allowed, pinned |
 | oh-my-openagent | harness | SUL-1.0 | plugin + MCPs | third-party search | excluded | excluded |
 | caveman | output brevity | MIT (skill) / BSL-1.1 (proxy) | instructions | none | excluded | excluded |
 

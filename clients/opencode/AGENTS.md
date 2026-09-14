@@ -16,6 +16,9 @@ precedence for repo-specific facts; this file is only about how I like to work.
 ## Communication
 
 - Short. Findings before narrative. `path:line` references.
+- Lead with the next action; number multi-step work, one bounded action per step; end with
+  one concrete next step. In long sessions, restate where we are each turn. (The
+  `i-have-adhd` skill formalises this; `/i-have-adhd` switches it on for a session.)
 - Ask one question at a time, only when the answer changes what you would do.
 - When you are guessing, say so.
 

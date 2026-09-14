@@ -6,8 +6,8 @@
 # Usage: install-community-skills.sh [flags]
 #   retrieval / graphs / memory:  --serena --graphify --code-review-graph --beads
 #   methodology:                  --superpowers --spec-kit[=vX.Y.Z] --compound --aidlc
-#   other:                        --archify --ponytail
-#   --recommended   = --serena --code-review-graph --beads --spec-kit --archify   (no plugins, no methodology pack)
+#   other:                        --archify --ponytail --i-have-adhd
+#   --recommended   = --serena --code-review-graph --beads --spec-kit --archify --i-have-adhd   (no plugins, no methodology pack)
 # Plugin-based tools (superpowers, compound, ponytail) are installed inside the client; this
 # script prints the exact commands instead of editing plugin state blindly.
 set -euo pipefail
@@ -17,10 +17,10 @@ speckit_ref=""
 [[ $# -gt 0 ]] || { sed -n '2,12p' "$0"; exit 1; }
 for a in "$@"; do
   case "$a" in
-    --serena|--graphify|--code-review-graph|--beads|--superpowers|--compound|--aidlc|--archify|--ponytail) want["${a#--}"]=1 ;;
+    --serena|--graphify|--code-review-graph|--beads|--superpowers|--compound|--aidlc|--archify|--ponytail|--i-have-adhd) want["${a#--}"]=1 ;;
     --spec-kit) want[spec-kit]=1 ;;
     --spec-kit=*) want[spec-kit]=1; speckit_ref="${a#--spec-kit=}" ;;
-    --recommended) want[serena]=1; want[code-review-graph]=1; want[beads]=1; want[spec-kit]=1; want[archify]=1 ;;
+    --recommended) want[serena]=1; want[code-review-graph]=1; want[beads]=1; want[spec-kit]=1; want[archify]=1; want[i-have-adhd]=1 ;;
     *) echo "unknown flag: $a" >&2; exit 1 ;;
   esac
 done
@@ -129,6 +129,22 @@ if [[ -n "${want[archify]:-}" ]]; then
   hr "archify (validated diagrams; skill + Node renderer)"
   need npx "install Node.js"
   npx -y skills add tt-a1i/archify -g -y
+fi
+
+if [[ -n "${want[i-have-adhd]:-}" ]]; then
+  hr "i-have-adhd (action-first output ruleset; on demand via /i-have-adhd)"
+  need npx "install Node.js"
+  npx -y skills add ayghri/i-have-adhd -g -y
+  cat <<'EOT'
+  Always-on (optional; injects the ruleset every turn):
+    OpenCode:    git clone https://github.com/ayghri/i-have-adhd ~/.config/opencode/vendor/i-have-adhd
+                 add the absolute path of ~/.config/opencode/vendor/i-have-adhd/.opencode/plugins/i-have-adhd.mjs to "plugin" in opencode.json
+                 touch ~/.config/opencode/.i-have-adhd-always
+    Claude Code: claude plugin marketplace add ayghri/i-have-adhd && claude plugin install i-have-adhd@i-have-adhd
+                 touch ~/.claude/.i-have-adhd-always
+    Codex:       codex plugin marketplace add ayghri/i-have-adhd --ref main && codex plugin add i-have-adhd@i-have-adhd
+  Turn off for a session: say "stop adhd mode". AGENTS.md wins on conflict.
+EOT
 fi
 
 if [[ -n "${want[ponytail]:-}" ]]; then
